@@ -1,34 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using Y_Vision.Core;
 
 namespace Y_Vision.Triangulation
 {
     public class TriangulationTool
     {
-
-        protected class Point3D
-        {
-            public double X;
-            public double Y;
-            public double Z;
-
-            public Point3D(double x, double y, double z)
-            {
-                this.X = x;
-                this.Y = y;
-                this.Z = z;
-            }
-        }
-
         private class ClusteredPoint
         {
             public readonly Point3D Point;
             public readonly double ClusteredValue;
-		
+
             public ClusteredPoint(Point3D point, double clusteredValue)
             {
-                this.Point = point;
-                this.ClusteredValue = clusteredValue;
+                Point = point;
+                ClusteredValue = clusteredValue;
             }
         }
 
@@ -65,27 +51,27 @@ namespace Y_Vision.Triangulation
             }
 
             /* 'point 2' is the point where the line through the circle
-		 * intersection points crosses the line between the circle
-		 * centers.  
-		 */
+         * intersection points crosses the line between the circle
+         * centers.  
+         */
 
             /* Determine the distance from point 0 to point 2. */
-            a = ((r0*r0) - (r1*r1) + (d*d)) / (2.0 * d) ;
-		
+            a = ((r0 * r0) - (r1 * r1) + (d * d)) / (2.0 * d);
+
             /* Determine the coordinates of point 2. */
-            x2 = x0 + (dx * a/d);
-            z2 = z0 + (dz * a/d);
+            x2 = x0 + (dx * a / d);
+            z2 = z0 + (dz * a / d);
 
             /* Determine the distance from point 2 to either of the
-		 * intersection points.
-		 */
-            h = Math.Sqrt((r0*r0) - (a*a));
+         * intersection points.
+         */
+            h = Math.Sqrt((r0 * r0) - (a * a));
 
             /* Now determine the offsets of the intersection points from
-		 * point 2.
-		 */
-            rx = -dz * (h/d);
-            rz = dx * (h/d);
+         * point 2.
+         */
+            rx = -dz * (h / d);
+            rz = dx * (h / d);
 
             /* Determine the absolute intersection points. */
             Point3D point1 = new Point3D(x2 + rx, 0, z2 + rz);
@@ -103,15 +89,15 @@ namespace Y_Vision.Triangulation
         }
 
         // will return a list of the N most clustered points in lPoints
-        private List<Point3D> cluster(List<Point3D> lPoints, int n)
+        private List<Point3D> Cluster(List<Point3D> lPoints, int n)
         {
             int nbPoints = lPoints.Count;
             List<ClusteredPoint> clusteringPoints = new List<ClusteredPoint>();
 
-            for (int i=0; i < nbPoints; i++)
+            for (int i = 0; i < nbPoints; i++)
             {
                 List<double> lDist = new List<double>();
-                for (int j=0; j < nbPoints; j++)
+                for (int j = 0; j < nbPoints; j++)
                 {
                     if (i == j)
                     {
@@ -127,7 +113,7 @@ namespace Y_Vision.Triangulation
                 // get the N-1 lowest distances and add them to get the clustering value of point A
                 lDist.Sort();
                 double sumDist = 0.0d;
-                for (int k=0; k < n; k++)
+                for (int k = 0; k < n; k++)
                 {
                     sumDist += lDist[k];
                 }
@@ -136,8 +122,8 @@ namespace Y_Vision.Triangulation
 
             // get the N lowest clustered values
             clusteringPoints.Sort((a, b) => a.ClusteredValue.CompareTo(b.ClusteredValue));
-            List<Point3D> returnCluster = new List<Point3D> ();
-            for (int i=0; i < n; i++)
+            List<Point3D> returnCluster = new List<Point3D>();
+            for (int i = 0; i < n; i++)
             {
                 returnCluster.Add(clusteringPoints[i].Point);
             }
@@ -145,16 +131,18 @@ namespace Y_Vision.Triangulation
             return returnCluster;
         }
 
-        private void CalculateSensorPos(int idSensor)
+        // returns true if everything went well
+        private bool CalculateSensorPos(int idSensor)
         {
             int nbPoints = _points[idSensor].Count;
+            int nbRealIntersections = 0;
 
             List<Point3D> intersections = new List<Point3D>();
             double x0, z0, r0, x1, z1, r1;
 
-            for (int i=0; i < nbPoints; i++)
+            for (int i = 0; i < nbPoints; i++)
             {
-                for (int j=i+1; j < nbPoints; j++)
+                for (int j = i + 1; j < nbPoints; j++)
                 {
                     // always use the coordinate from the first sensor since it is the reference
                     x0 = _points[0][i].X;
@@ -167,36 +155,45 @@ namespace Y_Vision.Triangulation
                     List<Point3D> inters = circle_circle_intersection(x0, z0, r0, x1, z1, r1);
                     if (inters != null)
                     {
-                        // should always be the case
+                        nbRealIntersections++;
                         intersections.AddRange(inters);
                     }
                 }
             }
 
-            /*Debug.Log("Intersections for sensor " + idSensor);
-		foreach(Point3D aPoint in intersections)
-		{
-			Debug.Log(aPoint.x + "/" + aPoint.y + "/" + aPoint.z);
-		}*/
+            /*if (nbPoints > intersections.Count)
+        {
+            nbPoints = intersections.Count;
+        }*/
 
-            if (nbPoints > intersections.Count)
+            if (nbRealIntersections < 2)
             {
-                nbPoints = intersections.Count;
+                // We need at the very least 2 group of intersections from the circles
+                if (ThrowExceptions)
+                {
+                    throw new MissingFieldException("The input coordinates are not enough to triangulate.");
+                }
+                else
+                {
+                    return false;
+                }
             }
 
-            List<Point3D> clusteredPoints = cluster(intersections, nbPoints);
+            List<Point3D> clusteredPoints = Cluster(intersections, nbRealIntersections);
 
             // Calculate the mean value of the cluster
             Point3D sumOfCluster = new Point3D(0.0d, 0.0d, 0.0d);
-            for (int i=0; i < nbPoints; i++)
+            for (int i = 0; i < nbRealIntersections; i++)
             {
                 sumOfCluster.X += clusteredPoints[i].X;
                 sumOfCluster.Y += clusteredPoints[i].Y;
                 sumOfCluster.Z += clusteredPoints[i].Z;
             }
-            SensorsPos[idSensor].X = sumOfCluster.X / (double)nbPoints;
-            SensorsPos[idSensor].Y = sumOfCluster.Y / (double)nbPoints;
-            SensorsPos[idSensor].Z = sumOfCluster.Z / (double)nbPoints;
+            SensorsPos[idSensor].X = sumOfCluster.X / (double)nbRealIntersections;
+            SensorsPos[idSensor].Y = sumOfCluster.Y / (double)nbRealIntersections;
+            SensorsPos[idSensor].Z = sumOfCluster.Z / (double)nbRealIntersections;
+
+            return true;
         }
 
         private void CalculateTransformationMatrix(int idSensor)
@@ -209,21 +206,21 @@ namespace Y_Vision.Triangulation
 
             // angle between sensor 0 and it's first point
             //double angle1 = Math.Atan2(points[0][0].z - sensorsPos[0].z, points[0][0].x - sensorsPos[0].x) * (180/Math.PI);
-            double angle1 = Math.Atan2(_points[0][0].Z - (SensorsPos[idSensor].Z - SensorsPos[0].Z), _points[0][0].X - (SensorsPos[idSensor].X - SensorsPos[0].X)) * (180/Math.PI);
+            double angle1 = Math.Atan2(_points[0][0].Z - (SensorsPos[idSensor].Z - SensorsPos[0].Z), _points[0][0].X - (SensorsPos[idSensor].X - SensorsPos[0].X)) * (180 / Math.PI);
             // angle between sensor idSensor and it's first point
             //double angle2 = Math.Atan2(points[idSensor][0].z - sensorsPos[idSensor].z, points[idSensor][0].x - sensorsPos[idSensor].x) * (180/Math.PI);
-            double angle2 = Math.Atan2(_points[idSensor][0].Z, _points[idSensor][0].X) * (180/Math.PI);
+            double angle2 = Math.Atan2(_points[idSensor][0].Z, _points[idSensor][0].X) * (180 / Math.PI);
             // difference
             SensorsAngle[idSensor] = angle1 - angle2;
         }
 
         // return true if still dirty
-        private bool undirty()
+        private bool Undirty()
         {
             // check if we have an equal number of points for each sensor
             int nbPoints = _points[0].Count;
             bool nbPointsOk = true;
-            for (int i=1; i < NbSensors; i++)
+            for (int i = 1; i < NbSensors; i++)
             {
                 if (nbPoints != _points[i].Count)
                 {
@@ -257,9 +254,12 @@ namespace Y_Vision.Triangulation
 
             // calculate the position of each sensor
             // first we calculate the first one since it is the reference
-            for (int i=0; i < NbSensors; i++)
+            for (int i = 0; i < NbSensors; i++)
             {
-                CalculateSensorPos(i);
+                if (!CalculateSensorPos(i))
+                {
+                    return true;
+                }
                 CalculateTransformationMatrix(i);
             }
 
@@ -282,7 +282,7 @@ namespace Y_Vision.Triangulation
             _points = new List<Point3D>[nbSensors];
             SensorsPos = new Point3D[nbSensors];
             SensorsAngle = new double[nbSensors];
-            for (int i=0; i < nbSensors; i++)
+            for (int i = 0; i < nbSensors; i++)
             {
                 _points[i] = new List<Point3D>();
                 SensorsPos[i] = new Point3D(0.0d, 0.0d, 0.0d);
@@ -301,7 +301,7 @@ namespace Y_Vision.Triangulation
 
         public virtual void Reset()
         {
-            for (int i=0; i < NbSensors; i++)
+            for (int i = 0; i < NbSensors; i++)
             {
                 _points[i].Clear();
             }
@@ -317,7 +317,7 @@ namespace Y_Vision.Triangulation
             {
                 if (ThrowExceptions)
                 {
-                    throw new ArgumentException("idSensor must between 0 and " + (NbSensors-1));
+                    throw new ArgumentException("idSensor must between 0 and " + (NbSensors - 1));
                 }
                 else
                 {
@@ -330,13 +330,14 @@ namespace Y_Vision.Triangulation
             _dirty = true;
         }
 
+        // will throw a MissingFieldException if the input coordinates are insufficient to triangulate
         public virtual double GetSensorPosX(int idSensor)
         {
             if (idSensor < 0 || idSensor >= NbSensors)
             {
                 if (ThrowExceptions)
                 {
-                    throw new ArgumentException("idSensor must between 0 and " + (NbSensors-1));
+                    throw new ArgumentException("idSensor must between 0 and " + (NbSensors - 1));
                 }
                 else
                 {
@@ -346,7 +347,7 @@ namespace Y_Vision.Triangulation
 
             if (_dirty)
             {
-                if (_dirty = undirty())
+                if (_dirty = Undirty())
                 {
                     return 0.0d;
                 }
@@ -355,63 +356,66 @@ namespace Y_Vision.Triangulation
             return SensorsPos[idSensor].X;
         }
 
+        // will throw a MissingFieldException if the input coordinates are insufficient to triangulate
         public virtual double GetSensorPosY(int idSensor)
         {
             if (idSensor < 0 || idSensor >= NbSensors)
             {
                 if (ThrowExceptions)
                 {
-                    throw new ArgumentException("idSensor must between 0 and " + (NbSensors-1));
+                    throw new ArgumentException("idSensor must between 0 and " + (NbSensors - 1));
                 }
                 else
                 {
                     return 0.0d;
                 }
             }
-		
+
             if (_dirty)
             {
-                if (_dirty = undirty())
+                if (_dirty = Undirty())
                 {
                     return 0.0d;
                 }
             }
-		
+
             return SensorsPos[idSensor].Y;
         }
 
+        // will throw a MissingFieldException if the input coordinates are insufficient to triangulate
         public virtual double GetSensorPosZ(int idSensor)
         {
             if (idSensor < 0 || idSensor >= NbSensors)
             {
                 if (ThrowExceptions)
                 {
-                    throw new ArgumentException("idSensor must between 0 and " + (NbSensors-1));
+                    throw new ArgumentException("idSensor must between 0 and " + (NbSensors - 1));
                 }
                 else
                 {
                     return 0.0d;
                 }
             }
-		
+
             if (_dirty)
             {
-                if (_dirty = undirty())
+                if (_dirty = Undirty())
                 {
                     return 0.0d;
                 }
             }
-		
+
             return SensorsPos[idSensor].Z;
         }
 
+        // will throw a MissingFieldException if the input coordinates are insufficient to triangulate
         public virtual double GetSensorAngle(int idSensor)
         {
             if (idSensor < 0 || idSensor >= NbSensors)
             {
                 if (ThrowExceptions)
                 {
-                    throw new ArgumentException("idSensor must between 0 and " + (NbSensors-1));
+                    throw new ArgumentException("idSensor must between 0 and " + (NbSensors - 1));
                 }
                 else
                 {
@@ -421,7 +425,7 @@ namespace Y_Vision.Triangulation
 
             if (_dirty)
             {
-                if (_dirty = undirty())
+                if (_dirty = Undirty())
                 {
                     return 0.0d;
                 }
@@ -431,53 +435,57 @@ namespace Y_Vision.Triangulation
         }
 
         // use this to get a coordinate based on the config
-        public static void GetNormalizedCoordinates(double sensorX, double sensorY, double sensorZ, double sensorAngle, ref double x, ref double y, ref double z)
+        public static Point3D? GetNormalizedCoordinates(double sensorX, double sensorY, double sensorZ, double sensorAngle)
         {
+            double x=0, y=0, z=0;
             double newX, newZ;
             double angle = Math.PI * sensorAngle / 180.0;
 
             /*newX = Math.Cos(angle) * x - Math.Sin(angle) * z + sensorX * (1 - Math.Cos(angle)) + sensorZ * Math.Sin(angle);
-		newZ = Math.Sin(angle) * x + Math.Cos(angle) * z - sensorX * Math.Sin(angle) + sensorZ * (1 - Math.Cos(angle));*/
+        newZ = Math.Sin(angle) * x + Math.Cos(angle) * z - sensorX * Math.Sin(angle) + sensorZ * (1 - Math.Cos(angle));*/
 
             newX = Math.Cos(angle) * x - Math.Sin(angle) * z + sensorX;
             newZ = Math.Sin(angle) * x + Math.Cos(angle) * z + sensorZ;
 
             x = newX;
             z = newZ;
+
+            return new Point3D(x,y,z);
         }
 
         // use this to get a coordinate after the triangulation
-        public virtual void GetNormalizedCoordinates(int idSensor, ref double x, ref double y, ref double z)
+        // will throw a MissingFieldException if the input coordinates are insufficient to triangulate
+        public virtual Point3D? GetNormalizedCoordinates(int idSensor)
         {
+            Point3D p;
             if (idSensor < 0 || idSensor >= NbSensors)
             {
                 if (ThrowExceptions)
                 {
-                    throw new ArgumentException("idSensor must between 0 and " + (NbSensors-1));
+                    throw new ArgumentException("idSensor must between 0 and " + (NbSensors - 1));
                 }
                 else
                 {
-                    return;
+                    return null;
                 }
             }
-		
+
             if (idSensor == 0)
             {
                 // coordinates are already mapped for the first sensor
-                return;
+                return null;
             }
 
             if (_dirty)
             {
-                if (_dirty = undirty())
+                if (_dirty = Undirty())
                 {
-                    return;
+                    return null;
                 }
             }
 
-            GetNormalizedCoordinates(SensorsPos[idSensor].X, SensorsPos[idSensor].Y, SensorsPos[idSensor].Z, SensorsAngle[idSensor], ref x, ref y, ref z);
+            return GetNormalizedCoordinates(SensorsPos[idSensor].X, SensorsPos[idSensor].Y, SensorsPos[idSensor].Z, SensorsAngle[idSensor]);
         }
-
     }
 }
 

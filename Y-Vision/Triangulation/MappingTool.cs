@@ -1,4 +1,5 @@
 ﻿using System;
+using Y_Vision.Core;
 
 namespace Y_Vision.Triangulation
 {
@@ -89,7 +90,7 @@ namespace Y_Vision.Triangulation
         }
 
         // use this to get a coordinate after the triangulation
-        public override void GetNormalizedCoordinates(int idSensor, ref double x, ref double y, ref double z)
+        public override Point3D? GetNormalizedCoordinates(int idSensor)
         {
             if (idSensor < 0 || idSensor >= NbSensors)
             {
@@ -99,17 +100,17 @@ namespace Y_Vision.Triangulation
                 }
                 else
                 {
-                    return;
+                    return null;
                 }
             }
 		
             if (idSensor == 0)
             {
                 // coordinates are already mapped for the first sensor
-                return;
+                return null;
             }
 		
-            GetNormalizedCoordinates(SensorsPos[idSensor].X, SensorsPos[idSensor].Y, SensorsPos[idSensor].Z, SensorsAngle[idSensor], ref x, ref y, ref z);
+            return GetNormalizedCoordinates(SensorsPos[idSensor].X, SensorsPos[idSensor].Y, SensorsPos[idSensor].Z, SensorsAngle[idSensor]);
         }
 
         public void SetSensorConfig(int idSensor, double sensorX, double sensorY, double sensorZ, double sensorAngle)
