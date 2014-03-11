@@ -3,22 +3,22 @@ using Y_Vision.Core;
 
 namespace Y_Vision.Triangulation
 {
-    public class MappingTool : TriangulationTool
+    public class MappingTool : CoordinateSystemTool
     {
 
-        public MappingTool(int nbSensors) : base(nbSensors)
-        {
+        public MappingTool(TriangulationTool tool) {
+            //double sensorX, double sensorY, double sensorZ, double sensorAngle
+            NbSensors = tool.NbSensors;
+            SensorsPos = new Point3D[tool.NbSensors];
+            SensorsAngle = new double[tool.NbSensors];
 
-        }
-
-        public override void Reset()
-        {
-                    
-        }
-
-        public override void AddTriangulationPoint(int idSensor, double x, double y, double z)
-        {
-
+            for (int i = 0; i < tool.NbSensors; i++)
+            {
+                SensorsPos[i].X = tool.SensorsPos[i].X;
+                SensorsPos[i].Y = tool.SensorsPos[i].Y;
+                SensorsPos[i].Z = tool.SensorsPos[i].Z;
+                SensorsAngle[i] = tool.SensorsAngle[i];
+            }
         }
 
         public override double GetSensorPosX(int idSensor)
@@ -110,7 +110,7 @@ namespace Y_Vision.Triangulation
                 return null;
             }
 		
-            return GetNormalizedCoordinates(SensorsPos[idSensor].X, SensorsPos[idSensor].Y, SensorsPos[idSensor].Z, SensorsAngle[idSensor]);
+            return GetNormalizedCoordinates(idSensor, SensorsPos[idSensor].X, SensorsPos[idSensor].Y, SensorsPos[idSensor].Z);
         }
 
         public void SetSensorConfig(int idSensor, double sensorX, double sensorY, double sensorZ, double sensorAngle)

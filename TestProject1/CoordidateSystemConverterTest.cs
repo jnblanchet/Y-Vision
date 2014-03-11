@@ -62,5 +62,15 @@ namespace YUnitTests
             Assert.AreEqual(-0.367, xyzPoint.Y, 0.1);
             Assert.AreEqual(0.93, xyzPoint.Z, 0.1);
         }
+
+        [TestMethod]
+        public void TestRotationXWithZ()
+        {
+            var xyzPoint = _csc.ToXyz(320, 120, 1, 240, 320);
+
+            Assert.AreEqual(.477, xyzPoint.X, 0.1);
+            Assert.AreEqual(0, xyzPoint.Y);
+            Assert.AreEqual(0.879, xyzPoint.Z, 0.1);
+        }
     }
 }

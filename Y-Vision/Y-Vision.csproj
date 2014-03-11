@@ -72,6 +72,7 @@
     <Compile Include="Tracking\TrackedObject.cs" />
     <Compile Include="Tracking\TrackableObject.cs" />
     <Compile Include="Tracking\Tracker.cs" />
+    <Compile Include="Triangulation\CoordinateSystemTool.cs" />
     <Compile Include="Triangulation\MappingTool.cs" />
     <Compile Include="Triangulation\TriangulationTool.cs" />
   </ItemGroup>

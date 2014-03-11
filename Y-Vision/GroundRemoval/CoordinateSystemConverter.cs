@@ -16,8 +16,8 @@ namespace Y_Vision.GroundRemoval
 
         public Point3D ToXyz(double onScreenX, double onScreenY, double distance, double h, double w)
         {
-            var angleX = -1 * ((onScreenX/w) - 0.5d)*(_context.HorizontalFieldOfView);
-            var angleY = ((onScreenY/h) - 0.5d)*(_context.VerticalFieldOfView);
+            var angleX = -1 * ((onScreenX/w) - 0.5d)*(_context.HorizontalFieldOfViewRad);
+            var angleY = ((onScreenY/h) - 0.5d)*(_context.VerticalFieldOfViewRad);
 
             // The horizontal angle (along the X axis) is rotated using the Y axis. The same applies to the vertical angle.
             var cartesianPoint = RotateXAxis(RotateYAxis(new Point3D(0, 0, 1), angleX), angleY);

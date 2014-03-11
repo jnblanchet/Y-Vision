@@ -7,6 +7,7 @@ namespace Y_Vision.Configuration
     [Serializable()]
     public class ParallaxConfig
     {
+        private const int MaxSampleCount = 10;
         private readonly Dictionary<string, List<Point3D>> _parallaxPoint3DSets;
         private readonly Dictionary<string, List<Point>> _referencePoint2DSets;
 
@@ -27,7 +28,7 @@ namespace Y_Vision.Configuration
 
             var list3D = _parallaxPoint3DSets[sensorId];
 
-            if(list3D.Count >= 3)
+            if (list3D.Count >= MaxSampleCount)
                 list3D.RemoveAt(0);
 
             list3D.Add(p3D);
@@ -38,7 +39,7 @@ namespace Y_Vision.Configuration
 
             var list2D = _referencePoint2DSets[sensorId];
 
-            if (list2D.Count >= 3)
+            if (list2D.Count >= MaxSampleCount)
                 list2D.RemoveAt(0);
 
             list2D.Add(p2D);
@@ -47,6 +48,9 @@ namespace Y_Vision.Configuration
 
         public IEnumerable<Point3D> Get3DPoints(string sensorId)
         {
+            if(String.IsNullOrEmpty(sensorId))
+                return null;
+
             if (!_parallaxPoint3DSets.ContainsKey(sensorId))
             {
                 _parallaxPoint3DSets.Add(sensorId, new List<Point3D>());
@@ -67,6 +71,20 @@ namespace Y_Vision.Configuration
             }
 
             return _referencePoint2DSets[sensorId];
+        }
+
+        public override string ToString()
+        {
+            string s = "";
+            foreach (var k in _parallaxPoint3DSets.Keys)
+            {
+                s += "sensor " + k + ": ";
+                foreach (var p in _parallaxPoint3DSets[k])
+                {
+                    s += "(" + p.X + "," + p.Y + "," + p.Z + "); ";
+                }
+            }
+            return s;
         }
     }
 }

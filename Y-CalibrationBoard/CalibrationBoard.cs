@@ -194,6 +194,8 @@ namespace Y_CalibrationBoard
 
         private HumanDetectorPipeline _parallaxLeft, _parallaxRight;
         private BitmapCreator _parallaxLeftBmp, _parallaxRightBmp;
+        private CoordinateSystemConverter _convL;
+        private CoordinateSystemConverter _convR;
 
         /// <summary>
         /// Initiated the 2d and 3d tab to handle point selection in the 2nd tab,
@@ -221,6 +223,7 @@ namespace Y_CalibrationBoard
                                                        }
                                                        DrawScene();
                                                    };
+            Console.WriteLine(_configs.ParallaxConfig.ToString());
         }
 
         /// <summary>
@@ -259,6 +262,7 @@ namespace Y_CalibrationBoard
                             _parallaxLeftBmp.DrawPointsWithUniqueColor(_parallaxLeftBmp.DepthBitamp, _configs.ParallaxConfig.Get2DPoints(conf.SensorId));
                             ParallaxContainer.DisplayFrames(_parallaxLeftBmp.DepthBitamp, null);
                         };
+                _convL = new CoordinateSystemConverter(_parallaxLeft.Context);
                 _parallaxLeft.Start();
             }
             else if (sender == comboBoxCalibrationRight)
@@ -272,39 +276,64 @@ namespace Y_CalibrationBoard
                             _parallaxRightBmp.CreateBitmapFromDepthFrame(_parallaxRight.RawDepth,_parallaxRight.DepthH,_parallaxRight.DepthW);
                             _parallaxRightBmp.DrawPointsWithUniqueColor(_parallaxRightBmp.DepthBitamp, _configs.ParallaxConfig.Get2DPoints(conf.SensorId));
                             ParallaxContainer.DisplayFrames(null, _parallaxRightBmp.DepthBitamp);
+                            DrawTrackedPeople();
                         };
+                _convR = new CoordinateSystemConverter(_parallaxRight.Context);
                 _parallaxRight.Start();
             }
+            DrawScene(); // Will not work if enough points aren't available
         }
         #endregion
 
         #region temporary drawing code
 
-        readonly SceneVisualizer _sceneDrawer = new SceneVisualizer();
+        private Bitmap _baseBitmap;
+        private readonly SceneVisualizer _sceneDrawer = new SceneVisualizer();
+        private MappingTool _mappingTool;
         private void DrawScene()
         {
             var tool = new TriangulationTool(2);
 
-            var pointsLeft = _configs.ParallaxConfig.Get3DPoints(comboBoxCalibrationLeft.Text).ToArray();
-            var pointsRight = _configs.ParallaxConfig.Get3DPoints(comboBoxCalibrationRight.Text).ToArray();
+            // Retrieve the points and validate there are enough
+            var pointsLeft = _configs.ParallaxConfig.Get3DPoints(comboBoxCalibrationLeft.Text);
+            var pointsRight = _configs.ParallaxConfig.Get3DPoints(comboBoxCalibrationRight.Text);
 
-            if (pointsLeft.Length < 3 || pointsRight.Length < 3)
+            if (pointsLeft == null || pointsRight == null)
                 return;
 
-            foreach (var p in pointsLeft)
+            var arrPointsLeft = pointsLeft.ToArray();
+            var arrPointsRight = pointsRight.ToArray();
+
+            if (arrPointsLeft.Length < 3 || arrPointsRight.Length < 3 || arrPointsLeft.Length != arrPointsRight.Length)
+                return;
+
+            // Add the points for triangulation (TODO: try catch and explain to pick other points)
+            foreach (var p in arrPointsLeft)
                 tool.AddTriangulationPoint(0, p.X, p.Y, p.Z);
-            foreach (var p in pointsRight)
+            foreach (var p in arrPointsRight)
                 tool.AddTriangulationPoint(1, p.X, p.Y, p.Z);
 
+            //TODO: add try catch for invalid points
+
+            // Retrieve the angle for drawing
             tool.GetSensorAngle(0);
             tool.GetSensorAngle(1);
 
-            SetupPictureBox.Image = _sceneDrawer.drawScene(SetupPictureBox.Width, SetupPictureBox.Height,
-                                            new Point((int)tool.GetSensorPosX(0), (int)tool.GetSensorPosZ(0)),
-                                            new Point((int)tool.GetSensorPosX(1), (int)tool.GetSensorPosZ(1)),
-                                            tool.GetSensorAngle(0), tool.GetSensorAngle(1),
-                                            4095);
+            // Get angle offsets so the sensor FoV can be drawn correctly
 
+
+            _baseBitmap = _sceneDrawer.DrawScene(SetupPictureBox.Width, SetupPictureBox.Height,
+                                                new Point((int) tool.GetSensorPosX(0), (int) -tool.GetSensorPosZ(0)),
+                                                new Point((int) tool.GetSensorPosX(1), (int) -tool.GetSensorPosZ(1)),
+                                                -90 - _parallaxLeft.Context.HorizontalFieldOfViewDeg / 2 + tool.GetSensorAngle(0),
+                                                -90 - _parallaxRight.Context.HorizontalFieldOfViewDeg / 2 + tool.GetSensorAngle(1),
+                                                4095,
+                                                (float) _parallaxLeft.Context.HorizontalFieldOfViewDeg,
+                                                (float) _parallaxRight.Context.HorizontalFieldOfViewDeg);
+
+            _mappingTool = new MappingTool(tool);
+
+            DrawTrackedPeople();
             /*var conf1 = _configs.GetConfigById(comboBoxCalibrationLeft.Text);
             var conf2 = _configs.GetConfigById(comboBoxCalibrationRight.Text);
             var p1 = conf1.ReferencePoint;
@@ -329,6 +358,40 @@ namespace Y_CalibrationBoard
                                                                new Point((int)pointNorm2.X, (int)pointNorm2.Z), (int) conf1.ReferencePoint2D.X, (int) conf2.ReferencePoint2D.X,
                                                                4095);
             }*/
+        }
+
+        private void DrawTrackedPeople()
+        {
+            // Also draw tracked people
+            if (_baseBitmap != null && _parallaxRight.DepthTrackedObjects != null)
+            {
+                var bmp = (Bitmap) _baseBitmap.Clone();
+
+                foreach (var /*obj*/p in /*_parallaxLeft.DepthTrackedObjects*/ _configs.ParallaxConfig.Get3DPoints(comboBoxCalibrationLeft.Text))
+                {
+                    //var p = _convL.ToXyz(obj.X, obj.Y, obj.Z, _parallaxLeftBmp.DepthBitamp.Width, _parallaxLeftBmp.DepthBitamp.Height);
+                    var normalizedP = _mappingTool.GetNormalizedCoordinates(0,p);
+                    if (normalizedP.HasValue)
+                    {
+                        var drawableP = _sceneDrawer.ConvertToLastKnownScale(new Point((int)normalizedP.Value.X, -(int)normalizedP.Value.Z));
+                        _bmpCreator.DrawPoint(bmp, new Y_Vision.Core.Point(drawableP.X, drawableP.Y), 1.0, 1);                        
+                    }
+                }
+
+
+                foreach (var /*obj*/p in /*_parallaxRight.DepthTrackedObjects*/_configs.ParallaxConfig.Get3DPoints(comboBoxCalibrationRight.Text))
+                {
+                    //var p = _convR.ToXyz(obj.X, obj.Y, obj.Z, _parallaxRightBmp.DepthBitamp.Width, _parallaxRightBmp.DepthBitamp.Height);
+                    var normalizedP = _mappingTool.GetNormalizedCoordinates(1, p);
+                    if (normalizedP.HasValue)
+                    {
+                        var drawableP = _sceneDrawer.ConvertToLastKnownScale(new Point((int)normalizedP.Value.X, -(int)normalizedP.Value.Z));
+                        _bmpCreator.DrawPoint(bmp, new Y_Vision.Core.Point(drawableP.X, drawableP.Y), 1.0, 2);
+                    }
+                }
+
+                SetupPictureBox.Image = bmp;
+            }
         }
         #endregion
     }

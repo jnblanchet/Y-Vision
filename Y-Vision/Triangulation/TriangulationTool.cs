@@ -4,7 +4,7 @@ using Y_Vision.Core;
 
 namespace Y_Vision.Triangulation
 {
-    public class TriangulationTool
+    public class TriangulationTool : CoordinateSystemTool
     {
         private class ClusteredPoint
         {
@@ -18,11 +18,7 @@ namespace Y_Vision.Triangulation
             }
         }
 
-        protected int NbSensors;
-        protected bool ThrowExceptions = true;
         private readonly List<Point3D>[] _points;
-        protected Point3D[] SensorsPos;
-        protected double[] SensorsAngle;
         private bool _dirty = true;
 
         // Based on http://paulbourke.net/geometry/circlesphere/tvoght.c Tim Voght, 3/26/2005
@@ -331,7 +327,7 @@ namespace Y_Vision.Triangulation
         }
 
         // will throw a MissingFieldException if the input coordinates are insufficient to triangulate
-        public virtual double GetSensorPosX(int idSensor)
+        public override double GetSensorPosX(int idSensor)
         {
             if (idSensor < 0 || idSensor >= NbSensors)
             {
@@ -357,7 +353,7 @@ namespace Y_Vision.Triangulation
         }
 
         // will throw a MissingFieldException if the input coordinates are insufficient to triangulate
-        public virtual double GetSensorPosY(int idSensor)
+        public override double GetSensorPosY(int idSensor)
         {
             if (idSensor < 0 || idSensor >= NbSensors)
             {
@@ -383,7 +379,7 @@ namespace Y_Vision.Triangulation
         }
 
         // will throw a MissingFieldException if the input coordinates are insufficient to triangulate
-        public virtual double GetSensorPosZ(int idSensor)
+        public override double GetSensorPosZ(int idSensor)
         {
             if (idSensor < 0 || idSensor >= NbSensors)
             {
@@ -409,7 +405,7 @@ namespace Y_Vision.Triangulation
         }
 
         // will throw a MissingFieldException if the input coordinates are insufficient to triangulate
-        public virtual double GetSensorAngle(int idSensor)
+        public override double GetSensorAngle(int idSensor)
         {
             if (idSensor < 0 || idSensor >= NbSensors)
             {
@@ -435,27 +431,10 @@ namespace Y_Vision.Triangulation
         }
 
         // use this to get a coordinate based on the config
-        public static Point3D? GetNormalizedCoordinates(double sensorX, double sensorY, double sensorZ, double sensorAngle)
-        {
-            double x=0, y=0, z=0;
-            double newX, newZ;
-            double angle = Math.PI * sensorAngle / 180.0;
-
-            /*newX = Math.Cos(angle) * x - Math.Sin(angle) * z + sensorX * (1 - Math.Cos(angle)) + sensorZ * Math.Sin(angle);
-        newZ = Math.Sin(angle) * x + Math.Cos(angle) * z - sensorX * Math.Sin(angle) + sensorZ * (1 - Math.Cos(angle));*/
-
-            newX = Math.Cos(angle) * x - Math.Sin(angle) * z + sensorX;
-            newZ = Math.Sin(angle) * x + Math.Cos(angle) * z + sensorZ;
-
-            x = newX;
-            z = newZ;
-
-            return new Point3D(x,y,z);
-        }
 
         // use this to get a coordinate after the triangulation
         // will throw a MissingFieldException if the input coordinates are insufficient to triangulate
-        public virtual Point3D? GetNormalizedCoordinates(int idSensor)
+        public override Point3D? GetNormalizedCoordinates(int idSensor)
         {
             Point3D p;
             if (idSensor < 0 || idSensor >= NbSensors)
@@ -484,7 +463,7 @@ namespace Y_Vision.Triangulation
                 }
             }
 
-            return GetNormalizedCoordinates(SensorsPos[idSensor].X, SensorsPos[idSensor].Y, SensorsPos[idSensor].Z, SensorsAngle[idSensor]);
+            return GetNormalizedCoordinates(idSensor, SensorsPos[idSensor].X, SensorsPos[idSensor].Y, SensorsPos[idSensor].Z);
         }
     }
 }

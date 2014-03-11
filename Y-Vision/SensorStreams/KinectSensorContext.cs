@@ -7,8 +7,10 @@ namespace Y_Vision.SensorStreams
 {
     public class KinectSensorContext //TODO: use abstraction for multiple sensor model support
     {
-        public double VerticalFieldOfView;
-        public double HorizontalFieldOfView;
+        public double VerticalFieldOfViewRad;
+        public double HorizontalFieldOfViewRad;
+        public double VerticalFieldOfViewDeg;
+        public double HorizontalFieldOfViewDeg;
 
         public const int MinDepthValue = 400;
         public const int MaxDepthValue = 4050;
@@ -25,12 +27,16 @@ namespace Y_Vision.SensorStreams
             switch(isDefaultSetup)
             {
                 case true:
-                    VerticalFieldOfView = 43.0d / 180.0d * Math.PI;
-                    HorizontalFieldOfView = 57.0d / 180.0d * Math.PI;
+                    VerticalFieldOfViewRad = 43.0d / 180.0d * Math.PI;
+                    HorizontalFieldOfViewRad = 57.0d / 180.0d * Math.PI;
+                    VerticalFieldOfViewDeg = 43.0d;
+                    HorizontalFieldOfViewDeg = 57.0d;
                     break;
                 case false:
-                    VerticalFieldOfView = 57.0d / 180.0d * Math.PI;
-                    HorizontalFieldOfView = 43.0d / 180.0d * Math.PI;
+                    VerticalFieldOfViewRad = 57.0d / 180.0d * Math.PI;
+                    HorizontalFieldOfViewRad = 43.0d / 180.0d * Math.PI;
+                    VerticalFieldOfViewDeg = 57.0d;
+                    HorizontalFieldOfViewDeg = 43.0d;
                     break;
             }
         }
