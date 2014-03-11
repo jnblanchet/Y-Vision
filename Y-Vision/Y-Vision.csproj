@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A306E913-41C8-4BBD-BE7B-C9BFBBB193EE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Y_Vision</RootNamespace>
+    <AssemblyName>Y-Vision</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Kinect">
+      <HintPath>..\..\..\..\..\Program Files\Microsoft SDKs\Kinect\v1.5\Assemblies\Microsoft.Kinect.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BlobDescriptor\BlobFilter.cs" />
+    <Compile Include="BlobDescriptor\BlobObject.cs" />
+    <Compile Include="Configuration\ConfigurationManager.cs" />
+    <Compile Include="Configuration\ParallaxConfig.cs" />
+    <Compile Include="Configuration\SensorConfig.cs" />
+    <Compile Include="ConnectedComponentLabeling\ConnectedComponentLabling.cs" />
+    <Compile Include="ConnectedComponentLabeling\DynamicDisjointSet.cs" />
+    <Compile Include="ConnectedComponentLabeling\DisjointSet.cs" />
+    <Compile Include="Core\Point.cs" />
+    <Compile Include="Core\Point3D.cs" />
+    <Compile Include="DetectionAPI\SingleSensor2DHumanDetector.cs" />
+    <Compile Include="DetectionAPI\ParallaxHumanDetector.cs" />
+    <Compile Include="DetectionAPI\TrackedPerson.cs" />
+    <Compile Include="GroundRemoval\CoordinateSystemConverter.cs" />
+    <Compile Include="GroundRemoval\PlaneGroundRemover.cs" />
+    <Compile Include="MicrosoftKinectHelpers\CallbackLock.cs" />
+    <Compile Include="MicrosoftKinectHelpers\ContextEventWrapper.cs" />
+    <Compile Include="MicrosoftKinectHelpers\KinectChangedEventArgs.cs" />
+    <Compile Include="MicrosoftKinectHelpers\KinectSensorChooser.cs" />
+    <Compile Include="MicrosoftKinectHelpers\ThreadSafeCollection.cs" />
+    <Compile Include="PipeLine\HumanDetectorPipeline.cs" />
+    <Compile Include="SensorStreams\IKinectStream.cs" />
+    <Compile Include="SensorStreams\KinectStreamMicrosoftAPI.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SensorStreams\DiscreteRotation.cs" />
+    <Compile Include="SensorStreams\KinectSensorContext.cs" />
+    <Compile Include="Tracking\BranchAndBound.cs" />
+    <Compile Include="Tracking\BranchAndBoundTracker.cs" />
+    <Compile Include="Tracking\TrackedObject.cs" />
+    <Compile Include="Tracking\TrackableObject.cs" />
+    <Compile Include="Tracking\Tracker.cs" />
+    <Compile Include="Triangulation\MappingTool.cs" />
+    <Compile Include="Triangulation\TriangulationTool.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Y-API\Y-API.csproj">
+      <Project>{65E528C8-8E43-4F90-A83F-9F2A9C957518}</Project>
+      <Name>Y-API</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
