@@ -201,16 +201,16 @@ namespace Y_Vision.Triangulation
 				return true;
 			}
 
-			int nbPoints = points[idSensor].Count;
+			int nbPoints = _points[idSensor].Count;
 			double[] angles = new double[nbPoints];
 			double angleSum = 0.0d;
 			for (int i=0; i < nbPoints; i++)
 			{
 				// angle between sensor 0 and it's point i
-				double angle1 = Math.Atan2(points[0][i].z - (sensorsPos[idSensor].z - sensorsPos[0].z), 
-					points[0][i].x - (sensorsPos[idSensor].x - sensorsPos[0].x)) * (180/Math.PI);
+                double angle1 = Math.Atan2(_points[0][i].Z - (SensorsPos[idSensor].Z - SensorsPos[0].Z), 
+					_points[0][i].X - (SensorsPos[idSensor].X - SensorsPos[0].X)) * (180/Math.PI);
 				// angle between sensor idSensor and it's point i
-				double angle2 = Math.Atan2(points[idSensor][i].z, points[idSensor][i].x) * (180/Math.PI);
+                double angle2 = Math.Atan2(_points[idSensor][i].Z, _points[idSensor][i].X) * (180 / Math.PI);
 				// difference
 				angles[i] = angle1 - angle2;
 				angleSum += angles[i];
@@ -227,10 +227,10 @@ namespace Y_Vision.Triangulation
 			double variance = squaredDifferencesSum / (double)nbPoints;
 			double stdDev = Math.Sqrt(variance);
 
-			sensorsAngle[idSensor] = meanAngle;
+			SensorsAngle[idSensor] = meanAngle;
 
 			// returns true if the stdDev is fine or if we don't want Exceptions
-			return stdDev <= maxAngleStdDev || !throwExceptions;
+			return stdDev <= maxAngleStdDev || !ThrowExceptions;
 		}
 
         // return true if still dirty
@@ -281,7 +281,7 @@ namespace Y_Vision.Triangulation
                     return true;
                 }
                 // stdDevOk becomes false as soon as there is a false return
-				stdDevOk = stdDevOk && calculateTransformationMatrix(i);
+				stdDevOk = stdDevOk && CalculateTransformationMatrix(i);
             }
 			
 			if (!stdDevOk)
