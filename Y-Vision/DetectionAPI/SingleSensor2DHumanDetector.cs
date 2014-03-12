@@ -54,7 +54,7 @@ namespace Y_Vision.DetectionAPI
             _detector.Stop();
         }
 
-        // TODO: currently all the data is merged here (since only a single depth channel is supported) but it should be done elsewhere
+        // All the data is merged here
         private void DetectorOnDetectionUpdate(object sender, EventArgs eventArgs)
         {
             if (_detector.DepthTrackedObjects == null)

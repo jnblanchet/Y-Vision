@@ -48,8 +48,8 @@ namespace Y_Vision.Tracking
             X += VelocityX;
             VelocityX *= 0.95;
 
-            Y += VelocityY;
-            VelocityY *= 0.35;
+            //Y += VelocityY;
+            //VelocityY *= 0.35;
 
             Z += VelocityZ;
             VelocityZ *= 0.75;
@@ -82,7 +82,7 @@ namespace Y_Vision.Tracking
             return (int)Math.Pow(other.X - (X + VelocityX), 2)
                    + (int)Math.Pow(other.Y - (Y + VelocityY), 2)
                    + (int)Math.Pow((other.Z - (Z + VelocityZ)) / 10, 2)
-                   + Math.Abs(Surface - other.Surface) / 10;
+                   + Math.Abs(Surface - other.Surface) / 20;
         }
 
         public override TrackedObject ToTrackedObject()

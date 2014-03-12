@@ -22,6 +22,7 @@ namespace Y_Vision.PipeLine
         private readonly ConnectedComponentLabling _ccl;
         private readonly BranchAndBoundTracker _tracker;
         private readonly PlaneGroundRemover _groundRemover;
+
         // Pipieline Artifact
         public List<TrackedObject> DepthTrackedObjects { private set; get; }
         public List<BlobObject> Blobs { private set; get; }
@@ -40,8 +41,8 @@ namespace Y_Vision.PipeLine
         private BackgroundWorker _depthProcessor;
         private BackgroundWorker _colorProcessor;
 
-        // TODO: REMOVE THIS (it only exists temporarily for easy testing)
         public KinectSensorContext Context { get { return _kinect.Context;  } }
+        public SensorConfig Config { private set; get; }
 
         public HumanDetectorPipeline(SensorConfig config)
         {
@@ -51,6 +52,7 @@ namespace Y_Vision.PipeLine
 
             _kinect = new KinectStreamMicrosoftApi(config);
             _groundRemover = new PlaneGroundRemover(_kinect.Context, config);
+            Config = config;
         }
 
 
