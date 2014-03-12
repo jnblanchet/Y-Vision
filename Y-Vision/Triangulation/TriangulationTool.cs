@@ -192,23 +192,46 @@ namespace Y_Vision.Triangulation
             return true;
         }
 
-        private void CalculateTransformationMatrix(int idSensor)
-        {
-            if (idSensor == 0)
-            {
-                // no transformations needed
-                return;
-            }
+		// returns true if the calculated values are good enough
+		private bool CalculateTransformationMatrix(int idSensor)
+		{
+			if (idSensor == 0)
+			{
+				// no transformations needed
+				return true;
+			}
 
-            // angle between sensor 0 and it's first point
-            //double angle1 = Math.Atan2(points[0][0].z - sensorsPos[0].z, points[0][0].x - sensorsPos[0].x) * (180/Math.PI);
-            double angle1 = Math.Atan2(_points[0][0].Z - (SensorsPos[idSensor].Z - SensorsPos[0].Z), _points[0][0].X - (SensorsPos[idSensor].X - SensorsPos[0].X)) * (180 / Math.PI);
-            // angle between sensor idSensor and it's first point
-            //double angle2 = Math.Atan2(points[idSensor][0].z - sensorsPos[idSensor].z, points[idSensor][0].x - sensorsPos[idSensor].x) * (180/Math.PI);
-            double angle2 = Math.Atan2(_points[idSensor][0].Z, _points[idSensor][0].X) * (180 / Math.PI);
-            // difference
-            SensorsAngle[idSensor] = angle1 - angle2;
-        }
+			int nbPoints = points[idSensor].Count;
+			double[] angles = new double[nbPoints];
+			double angleSum = 0.0d;
+			for (int i=0; i < nbPoints; i++)
+			{
+				// angle between sensor 0 and it's point i
+				double angle1 = Math.Atan2(points[0][i].z - (sensorsPos[idSensor].z - sensorsPos[0].z), 
+					points[0][i].x - (sensorsPos[idSensor].x - sensorsPos[0].x)) * (180/Math.PI);
+				// angle between sensor idSensor and it's point i
+				double angle2 = Math.Atan2(points[idSensor][i].z, points[idSensor][i].x) * (180/Math.PI);
+				// difference
+				angles[i] = angle1 - angle2;
+				angleSum += angles[i];
+			}
+			// get the mean
+			double meanAngle = angleSum / (double)nbPoints;
+
+			// calculate the standard variation
+			double squaredDifferencesSum = 0.0d;
+			for (int i=0; i < nbPoints; i++)
+			{
+				squaredDifferencesSum += Math.Pow(angles[i] - meanAngle, 2.0d);
+			}
+			double variance = squaredDifferencesSum / (double)nbPoints;
+			double stdDev = Math.Sqrt(variance);
+
+			sensorsAngle[idSensor] = meanAngle;
+
+			// returns true if the stdDev is fine or if we don't want Exceptions
+			return stdDev <= maxAngleStdDev || !throwExceptions;
+		}
 
         // return true if still dirty
         private bool Undirty()
@@ -249,6 +272,7 @@ namespace Y_Vision.Triangulation
             }
 
             // calculate the position of each sensor
+			bool stdDevOk = true;
             // first we calculate the first one since it is the reference
             for (int i = 0; i < NbSensors; i++)
             {
@@ -256,8 +280,19 @@ namespace Y_Vision.Triangulation
                 {
                     return true;
                 }
-                CalculateTransformationMatrix(i);
+                // stdDevOk becomes false as soon as there is a false return
+				stdDevOk = stdDevOk && calculateTransformationMatrix(i);
             }
+			
+			if (!stdDevOk)
+			{
+				// note that the data has still been calculated
+				// we can choose to ignore the exception and proceed
+				throw new DataMisalignedException("Warning: the triangulation made from " +
+					"the input points has been classified as rough. Using this configuration " +
+					"may produce undesired results. It is recommended that the triangulation " +
+					"be redone with other points.");
+			}
 
             return false;
         }

@@ -5,6 +5,10 @@ namespace Y_Vision.Triangulation
 {
     public abstract class CoordinateSystemTool
     {
+		// if we calculate a standard deviation greater than
+		// this for the sensor angle, reject the points
+		protected const double maxAngleStdDev = 8.0d;
+		
         internal int NbSensors;
         protected bool ThrowExceptions = true;
         internal Point3D[] SensorsPos;
