@@ -36,7 +36,7 @@ namespace Y_Visualization.Drawing
 
             // Draw sensors
             // Find the the drawing ratio in Pixel per PointUnit
-            double scale = 0.25 * (Math.Min(w * 0.9d, h * 0.9d) / 2) / (new[] { Math.Abs(positionSensor1.X), Math.Abs(positionSensor1.Y), Math.Abs(positionSensor2.X), Math.Abs(positionSensor2.Y) }).Max();
+            double scale = 0.05 * (Math.Min(w * 0.9d, h * 0.9d) / 2) / (new[] { Math.Abs(positionSensor1.X), Math.Abs(positionSensor1.Y), Math.Abs(positionSensor2.X), Math.Abs(positionSensor2.Y) }).Max();
             pxToMmRatio = scale;
 
             var redPen = new Pen(Brushes.Chartreuse, 2);

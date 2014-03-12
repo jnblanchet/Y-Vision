@@ -194,14 +194,14 @@ namespace Y_Visualization.Drawing
             }
         }
 
-        public void DrawPoint(Bitmap bmp, Point p, double scaleFactor = 1, int colorid = 1)
+        public void DrawPoint(Bitmap bmp, Point p, double scaleFactor = 1, int colorid = 1, int s = 4)
         {
             if (bmp != null)
             {
                 Graphics g = Graphics.FromImage(bmp);
 
-                var pen2 = new Pen(DarkColors[colorid], (int)(4 * scaleFactor));
-                g.DrawRectangle(pen2, new Rectangle((int)((p.X - 2) * scaleFactor), (int)((p.Y - 2) * scaleFactor), (int)(4 * scaleFactor), (int)(4 * scaleFactor)));
+                var pen2 = new Pen(DarkColors[colorid], (int)(s * scaleFactor));
+                g.DrawRectangle(pen2, new Rectangle((int)((p.X - (s >> 1)) * scaleFactor), (int)((p.Y - (s >> 1)) * scaleFactor), (int)(s * scaleFactor), (int)(s * scaleFactor)));
                 g.Flush();
             }
         }

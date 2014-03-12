@@ -24,10 +24,6 @@ namespace Y_Vision.Configuration
         internal List<Point3D> Ground;
         private int _rotationAngle;
         private double _groundRemovalDistanceThreshold;
-        // The position of the clicked point for vizualisation (on screen)
-        //public Point ReferencePoint2D;
-        // The 3d position of the reference point in space
-        //public Point3D ReferencePoint;
 
         public SensorConfig(string uniqueId)
         {

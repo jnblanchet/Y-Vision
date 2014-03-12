@@ -204,5 +204,24 @@ namespace YUnitTests
             var result = _bnb.Solve(input);
             ArrayAssert(result, expectedOutput);
         }
+
+        [TestMethod]
+        public void TestNoMatchSolutionFirst()
+        {
+            var input = new[,]
+                        {
+                          //| 0| 1| 2|
+                            {4, 4, 4},// 0
+                            {4, 1, 1},// 1
+                            {4, 4, 1},// 2
+                            {1, 4, 4},// 3
+                        };
+
+            var expectedOutput = new[] { BranchAndBound.NoMatchSolution, 1, 2, 0};
+
+            var result = _bnb.Solve(input);
+            ArrayAssert(result, expectedOutput);
+        }
+
     }
 }

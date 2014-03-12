@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using Microsoft.Kinect.Toolkit;
 using Y_Vision.Configuration;
-using Y_Vision.Core;
 using Y_Vision.GroundRemoval;
 using Y_Vision.PipeLine;
 using Y_Vision.SensorStreams;
@@ -215,28 +210,26 @@ namespace Y_CalibrationBoard
                                                        switch (args.SourceId)
                                                        {
                                                             case 1:
-                                                               UpdateParallaxConfig(_parallaxLeft, args.X, args.Y, comboBoxCalibrationLeft.Text);
+                                                               UpdateParallaxConfig(_parallaxLeft, args.X, args.Y, comboBoxCalibrationLeft.Text, _convL, _parallaxLeftBmp.DepthBitamp.Width, _parallaxLeftBmp.DepthBitamp.Height);
                                                                 break;
                                                             case 2:
-                                                                UpdateParallaxConfig(_parallaxRight, args.X, args.Y, comboBoxCalibrationRight.Text);
+                                                                UpdateParallaxConfig(_parallaxRight, args.X, args.Y, comboBoxCalibrationRight.Text, _convR, _parallaxRightBmp.DepthBitamp.Width, _parallaxRightBmp.DepthBitamp.Height);
                                                                 break;
                                                        }
                                                        DrawScene();
                                                    };
-            Console.WriteLine(_configs.ParallaxConfig.ToString());
         }
 
         /// <summary>
         /// Uses onscreen point and the pipeline to build the parallax configuration for the given sensor.
         /// </summary>
-        private void UpdateParallaxConfig(HumanDetectorPipeline pipeline, float x, float y, string sensorId)
+        private void UpdateParallaxConfig(HumanDetectorPipeline pipeline, float x, float y, string sensorId, CoordinateSystemConverter c,int h, int w)
         {
             var normalizedPoint = pipeline.RatioPointInRange(x, y);
             if (normalizedPoint.HasValue)
             {
-                //var cfg = _configs.GetConfigById(sensor);
-                //cfg.ReferencePoint = normalizedPoint.Value;
-                _configs.ParallaxConfig.AddPoint(sensorId, normalizedPoint.Value, new Y_Vision.Core.Point((int)normalizedPoint.Value.X, (int)normalizedPoint.Value.Y));
+                var pointMm = c.ToXyz(normalizedPoint.Value.X, normalizedPoint.Value.Y, normalizedPoint.Value.Z, h, w);
+                _configs.ParallaxConfig.AddPoint(sensorId, pointMm, new Y_Vision.Core.Point((int)normalizedPoint.Value.X, (int)normalizedPoint.Value.Y));
             }
         }
 
@@ -278,7 +271,7 @@ namespace Y_CalibrationBoard
                             ParallaxContainer.DisplayFrames(null, _parallaxRightBmp.DepthBitamp);
                             DrawTrackedPeople();
                         };
-                _convR = new CoordinateSystemConverter(_parallaxRight.Context);
+                _convR = new CoordinateSystemConverter(_parallaxLeft.Context);
                 _parallaxRight.Start();
             }
             DrawScene(); // Will not work if enough points aren't available
@@ -318,9 +311,6 @@ namespace Y_CalibrationBoard
             // Retrieve the angle for drawing
             tool.GetSensorAngle(0);
             tool.GetSensorAngle(1);
-
-            // Get angle offsets so the sensor FoV can be drawn correctly
-
 
             _baseBitmap = _sceneDrawer.DrawScene(SetupPictureBox.Width, SetupPictureBox.Height,
                                                 new Point((int) tool.GetSensorPosX(0), (int) -tool.GetSensorPosZ(0)),
@@ -367,28 +357,56 @@ namespace Y_CalibrationBoard
             {
                 var bmp = (Bitmap) _baseBitmap.Clone();
 
-                foreach (var /*obj*/p in /*_parallaxLeft.DepthTrackedObjects*/ _configs.ParallaxConfig.Get3DPoints(comboBoxCalibrationLeft.Text))
+                // Draw Left sensor tracked objects
+                foreach (var obj in _parallaxLeft.DepthTrackedObjects)
                 {
-                    //var p = _convL.ToXyz(obj.X, obj.Y, obj.Z, _parallaxLeftBmp.DepthBitamp.Width, _parallaxLeftBmp.DepthBitamp.Height);
+                    var p = _convL.ToXyz(obj.X, obj.Y, obj.Z, _parallaxLeftBmp.DepthBitamp.Width, _parallaxLeftBmp.DepthBitamp.Height);
                     var normalizedP = _mappingTool.GetNormalizedCoordinates(0,p);
                     if (normalizedP.HasValue)
                     {
                         var drawableP = _sceneDrawer.ConvertToLastKnownScale(new Point((int)normalizedP.Value.X, -(int)normalizedP.Value.Z));
-                        _bmpCreator.DrawPoint(bmp, new Y_Vision.Core.Point(drawableP.X, drawableP.Y), 1.0, 1);                        
+                        _bmpCreator.DrawPoint(bmp, new Y_Vision.Core.Point(drawableP.X, drawableP.Y), 1.0, 1, 6);                        
                     }
                 }
 
-
-                foreach (var /*obj*/p in /*_parallaxRight.DepthTrackedObjects*/_configs.ParallaxConfig.Get3DPoints(comboBoxCalibrationRight.Text))
+                var cL = _configs.ParallaxConfig.Get3DPoints(comboBoxCalibrationLeft.Text);
+                if (cL == null) return;
+                // Draw Left sensor tracking points
+                foreach (var p in cL)
                 {
-                    //var p = _convR.ToXyz(obj.X, obj.Y, obj.Z, _parallaxRightBmp.DepthBitamp.Width, _parallaxRightBmp.DepthBitamp.Height);
+                    var normalizedP = _mappingTool.GetNormalizedCoordinates(0, p);
+                    if (normalizedP.HasValue)
+                    {
+                        var drawableP = _sceneDrawer.ConvertToLastKnownScale(new Point((int)normalizedP.Value.X, -(int)normalizedP.Value.Z));
+                        _bmpCreator.DrawPoint(bmp, new Y_Vision.Core.Point(drawableP.X, drawableP.Y), 1.0, 1, 2);
+                    }
+                }
+
+                // Draw Right sensor tracked objects
+                foreach (var obj in _parallaxRight.DepthTrackedObjects)
+                {
+                    var p = _convR.ToXyz(obj.X, obj.Y, obj.Z, _parallaxRightBmp.DepthBitamp.Width, _parallaxRightBmp.DepthBitamp.Height);
                     var normalizedP = _mappingTool.GetNormalizedCoordinates(1, p);
                     if (normalizedP.HasValue)
                     {
                         var drawableP = _sceneDrawer.ConvertToLastKnownScale(new Point((int)normalizedP.Value.X, -(int)normalizedP.Value.Z));
-                        _bmpCreator.DrawPoint(bmp, new Y_Vision.Core.Point(drawableP.X, drawableP.Y), 1.0, 2);
+                        _bmpCreator.DrawPoint(bmp, new Y_Vision.Core.Point(drawableP.X, drawableP.Y), 1.0, 2, 6);
                     }
                 }
+
+                var cR = _configs.ParallaxConfig.Get3DPoints(comboBoxCalibrationRight.Text);
+                if (cR == null) return;
+                // Draw right sensor tracking points
+                foreach (var p in cR)
+                {
+                    var normalizedP = _mappingTool.GetNormalizedCoordinates(1, p);
+                    if (normalizedP.HasValue)
+                    {
+                        var drawableP = _sceneDrawer.ConvertToLastKnownScale(new Point((int)normalizedP.Value.X, -(int)normalizedP.Value.Z));
+                        _bmpCreator.DrawPoint(bmp, new Y_Vision.Core.Point(drawableP.X, drawableP.Y), 1.0, 2, 2);
+                    }
+                }
+
 
                 SetupPictureBox.Image = bmp;
             }

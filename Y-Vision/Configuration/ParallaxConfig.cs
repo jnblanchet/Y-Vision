@@ -7,7 +7,7 @@ namespace Y_Vision.Configuration
     [Serializable()]
     public class ParallaxConfig
     {
-        private const int MaxSampleCount = 10;
+        private const int MaxSampleCount = 6;
         private readonly Dictionary<string, List<Point3D>> _parallaxPoint3DSets;
         private readonly Dictionary<string, List<Point>> _referencePoint2DSets;
 
@@ -75,13 +75,22 @@ namespace Y_Vision.Configuration
 
         public override string ToString()
         {
-            string s = "";
+            string s = "\nin 3D:\n";
             foreach (var k in _parallaxPoint3DSets.Keys)
             {
-                s += "sensor " + k + ": ";
+                s += "sensor " + k + ": \n";
                 foreach (var p in _parallaxPoint3DSets[k])
                 {
-                    s += "(" + p.X + "," + p.Y + "," + p.Z + "); ";
+                    s += "(" + p.X + "," + p.Y + "," + p.Z + "); \n";
+                }
+            }
+            s += "\nin 2D:\n";
+            foreach (var k in _referencePoint2DSets.Keys)
+            {
+                s += "sensor " + k + ": \n";
+                foreach (var p in _referencePoint2DSets[k])
+                {
+                    s += "(" + p.X + "," + p.Y + "," + p.Z + "); \n";
                 }
             }
             return s;

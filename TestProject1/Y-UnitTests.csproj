@@ -50,6 +50,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CclTest.cs" />
     <Compile Include="TestRotation.cs" />
+    <Compile Include="TriangulationToolTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Y-Vision\Y-Vision.csproj">

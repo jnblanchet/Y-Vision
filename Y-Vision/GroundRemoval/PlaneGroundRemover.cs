@@ -26,7 +26,8 @@ namespace Y_Vision.GroundRemoval
         private readonly CoordinateSystemConverter _distanceConverter;
         private Point3D _normalVector, _p0;
 
-        public PlaneGroundRemover(KinectSensorContext context, SensorConfig config, int maxSamples = 3)
+        // TODO: Allow maxSamples configuration
+        public PlaneGroundRemover(KinectSensorContext context, SensorConfig config, int maxSamples = 4)
         {            
             _points = config.Ground;
             config.GroundPointsChanged += (sender, args) => AddPoint(args.Point);
