@@ -54,7 +54,7 @@ namespace Y_TcpClient
         /// </summary>
         public bool SendAsync(string data)
         {
-            if (_tcpSender.Connected)
+            if (_tcpSender != null && _tcpSender.Connected)
             {
                 var t = new Thread(SendData);
                 t.Start(data);
