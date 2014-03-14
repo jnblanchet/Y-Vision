@@ -30,6 +30,7 @@ namespace Y_Vision.Tracking
                 {
                     // Valid match: update tracking!
                     TrackedObjects.ElementAt(matches[i]).UpdateTrackedFrame(newObjs[i]);
+                    Console.WriteLine("Object Tracked with a distance of " + TrackedObjects.ElementAt(matches[i]).ComputeDistanceWith(newObjs[i]));
                 }
             }
         }
@@ -43,6 +44,7 @@ namespace Y_Vision.Tracking
                 for (int i = 0; i < TrackedObjects.Count; i++)
                 {
                     scores[j, i] = TrackedObjects.ElementAt(i).ComputeDistanceWith(newObjects.ElementAt(j));
+                    Console.WriteLine("Computed Distance=" + scores[j, i]);
                 }
             }
             return scores;

@@ -10,9 +10,14 @@ namespace Y_Vision.Tracking
     /// </summary>
     public abstract class TrackableObject
     {
+        // Even though input is discrete (int), double allows more interpolation, extrapolation and smoothing precision
         public double X { get; protected set; }
         public double Y { get; protected set; }
         public double Z { get; protected set; }
+        public double OnscreenX { get; protected set; }
+        public double OnscreenY { get; protected set; }
+        public double DistanceZ { get; protected set; }
+
         public int Surface { get; protected set; }
 
         public int MinX { get; protected set; }

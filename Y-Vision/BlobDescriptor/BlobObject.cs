@@ -3,43 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Y_Vision.ConnectedComponentLabeling;
-using Y_Vision.Tracking;
+using Y_Vision.GroundRemoval;
 
 namespace Y_Vision.BlobDescriptor
 {
-    public class BlobObject : TrackableObject
+    /// <summary>
+    /// represents a set of pixels associated with a segmented object. Unlike the flatBlob, its coordinates represent a position in 3d space.
+    /// </summary>
+    class BlobObject : FlatBlobObject
     {
-        public BlobObject(ConnectedComponentLabling.Blob blob)
+        public BlobObject(ConnectedComponentLabling.Blob blob, CoordinateSystemConverter conv, int h, int w) : base(blob)
         {
-            X = blob.X;
-            Y = blob.Y;
-            Z = blob.Z;
-
-            MaxX = blob.MaxX;
-            MinX = blob.MinX;
-            MaxY = blob.MaxY;
-            MinY = blob.MinY;
-
-            Surface = blob.Count;
-        }
-
-
-        public override int ComputeDistanceWith(TrackableObject other)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override TrackedObject ToTrackedObject()
-        {
-            return new TrackedObject(X, Y, Z, MaxX, MinX, MaxY, MinY,Surface);
-        }
-
-      
-
-        public override string ToString()
-        {
-            return String.Format("Blob at ({0},{1}) with size ({2},{3}) and total surface = {4}", X, Y,
-                                 MaxX - MinX, MaxY - MinY, Surface);
+            var realCoords = conv.ToXyz(blob.X, blob.Y, blob.Z + 100, h, w);
+            X = realCoords.X;
+            Y = realCoords.Y;
+            Z = realCoords.Z;
         }
     }
 }

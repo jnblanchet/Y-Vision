@@ -16,7 +16,7 @@ namespace Y_Visualization.Drawing
             
         }
 
-        public Bitmap DrawScene(int w, int h, Point positionSensor1, Point positionSensor2, double angle1, double angle2, double range, float FoV1, float FoV2)
+        public Bitmap DrawScene(int w, int h, Point positionSensor1, Point positionSensor2, double angle1, double angle2, double range, float FoV1, float FoV2, float userScaleFactor = 0.05f)
         {
             // Init
             if (_scene == null || _scene.Width != w || _scene.Height != h)
@@ -36,7 +36,7 @@ namespace Y_Visualization.Drawing
 
             // Draw sensors
             // Find the the drawing ratio in Pixel per PointUnit
-            double scale = 0.05 * (Math.Min(w * 0.9d, h * 0.9d) / 2) / (new[] { Math.Abs(positionSensor1.X), Math.Abs(positionSensor1.Y), Math.Abs(positionSensor2.X), Math.Abs(positionSensor2.Y) }).Max();
+            double scale = userScaleFactor * (Math.Min(w * 0.9d, h * 0.9d) / 2) / (new[] { Math.Abs(positionSensor1.X), Math.Abs(positionSensor1.Y), Math.Abs(positionSensor2.X), Math.Abs(positionSensor2.Y) }).Max();
             pxToMmRatio = scale;
 
             var redPen = new Pen(Brushes.Chartreuse, 2);

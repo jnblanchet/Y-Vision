@@ -31,6 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CalibrationBoard));
             this.tabControl = new System.Windows.Forms.TabControl();
             this.SensorSetupTab = new System.Windows.Forms.TabPage();
+            this.setupRgbdViewer = new Y_Visualization.Drawing.RgbdViewer();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.cbSensorId = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripFpsLabel = new System.Windows.Forms.ToolStripLabel();
@@ -51,10 +52,13 @@
             this.calibrationSplitContainer = new System.Windows.Forms.SplitContainer();
             this.comboBoxCalibrationRight = new System.Windows.Forms.ComboBox();
             this.comboBoxCalibrationLeft = new System.Windows.Forms.ComboBox();
-            this.VisionBoardTab = new System.Windows.Forms.TabPage();
-            this.SetupPictureBox = new System.Windows.Forms.PictureBox();
-            this.setupRgbdViewer = new Y_Visualization.Drawing.RgbdViewer();
             this.ParallaxContainer = new Y_Visualization.Drawing.RgbdViewer();
+            this.VisionBoardTab = new System.Windows.Forms.TabPage();
+            this.toolStrip2 = new System.Windows.Forms.ToolStrip();
+            this.toolStripLabel3 = new System.Windows.Forms.ToolStripLabel();
+            this.userSceneScale = new System.Windows.Forms.ToolStripComboBox();
+            this.averageButton = new System.Windows.Forms.ToolStripButton();
+            this.SetupPictureBox = new System.Windows.Forms.PictureBox();
             this.tabControl.SuspendLayout();
             this.SensorSetupTab.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -64,6 +68,7 @@
             this.calibrationSplitContainer.Panel2.SuspendLayout();
             this.calibrationSplitContainer.SuspendLayout();
             this.VisionBoardTab.SuspendLayout();
+            this.toolStrip2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SetupPictureBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -91,6 +96,15 @@
             this.SensorSetupTab.TabIndex = 0;
             this.SensorSetupTab.Text = "Sensor Setup";
             this.SensorSetupTab.UseVisualStyleBackColor = true;
+            // 
+            // setupRgbdViewer
+            // 
+            this.setupRgbdViewer.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.setupRgbdViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.setupRgbdViewer.Location = new System.Drawing.Point(3, 28);
+            this.setupRgbdViewer.Name = "setupRgbdViewer";
+            this.setupRgbdViewer.Size = new System.Drawing.Size(970, 405);
+            this.setupRgbdViewer.TabIndex = 1;
             // 
             // toolStrip1
             // 
@@ -172,7 +186,6 @@
             // GroundThresholdTextBox
             // 
             this.GroundThresholdTextBox.Enabled = false;
-            this.GroundThresholdTextBox.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.GroundThresholdTextBox.Name = "GroundThresholdTextBox";
             this.GroundThresholdTextBox.Size = new System.Drawing.Size(30, 25);
             this.GroundThresholdTextBox.ToolTipText = "The threshold for ground removal in mm";
@@ -282,8 +295,18 @@
             this.comboBoxCalibrationLeft.TabIndex = 0;
             this.comboBoxCalibrationLeft.SelectedIndexChanged += new System.EventHandler(this.ComboBoxCalibrationSelectedIndexChanged);
             // 
+            // ParallaxContainer
+            // 
+            this.ParallaxContainer.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.ParallaxContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ParallaxContainer.Location = new System.Drawing.Point(0, 0);
+            this.ParallaxContainer.Name = "ParallaxContainer";
+            this.ParallaxContainer.Size = new System.Drawing.Size(970, 401);
+            this.ParallaxContainer.TabIndex = 0;
+            // 
             // VisionBoardTab
             // 
+            this.VisionBoardTab.Controls.Add(this.toolStrip2);
             this.VisionBoardTab.Controls.Add(this.SetupPictureBox);
             this.VisionBoardTab.Location = new System.Drawing.Point(4, 22);
             this.VisionBoardTab.Name = "VisionBoardTab";
@@ -291,6 +314,48 @@
             this.VisionBoardTab.TabIndex = 2;
             this.VisionBoardTab.Text = "Vision Board";
             this.VisionBoardTab.UseVisualStyleBackColor = true;
+            // 
+            // toolStrip2
+            // 
+            this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripLabel3,
+            this.userSceneScale,
+            this.averageButton});
+            this.toolStrip2.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip2.Name = "toolStrip2";
+            this.toolStrip2.Size = new System.Drawing.Size(976, 25);
+            this.toolStrip2.TabIndex = 1;
+            this.toolStrip2.Text = "toolStrip2";
+            // 
+            // toolStripLabel3
+            // 
+            this.toolStripLabel3.Name = "toolStripLabel3";
+            this.toolStripLabel3.Size = new System.Drawing.Size(37, 22);
+            this.toolStripLabel3.Text = "Scale:";
+            // 
+            // userSceneScale
+            // 
+            this.userSceneScale.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.userSceneScale.Items.AddRange(new object[] {
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6"});
+            this.userSceneScale.Name = "userSceneScale";
+            this.userSceneScale.Size = new System.Drawing.Size(121, 25);
+            this.userSceneScale.SelectedIndexChanged += new System.EventHandler(this.UserSceneScaleSelectedIndexChanged);
+            // 
+            // averageButton
+            // 
+            this.averageButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.averageButton.Image = ((System.Drawing.Image)(resources.GetObject("averageButton.Image")));
+            this.averageButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.averageButton.Name = "averageButton";
+            this.averageButton.Size = new System.Drawing.Size(23, 22);
+            this.averageButton.Text = "Average";
+            this.averageButton.Click += new System.EventHandler(this.AverageButtonClick);
             // 
             // SetupPictureBox
             // 
@@ -300,24 +365,6 @@
             this.SetupPictureBox.Size = new System.Drawing.Size(976, 436);
             this.SetupPictureBox.TabIndex = 0;
             this.SetupPictureBox.TabStop = false;
-            // 
-            // setupRgbdViewer
-            // 
-            this.setupRgbdViewer.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.setupRgbdViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.setupRgbdViewer.Location = new System.Drawing.Point(3, 28);
-            this.setupRgbdViewer.Name = "setupRgbdViewer";
-            this.setupRgbdViewer.Size = new System.Drawing.Size(970, 405);
-            this.setupRgbdViewer.TabIndex = 1;
-            // 
-            // ParallaxContainer
-            // 
-            this.ParallaxContainer.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ParallaxContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ParallaxContainer.Location = new System.Drawing.Point(0, 0);
-            this.ParallaxContainer.Name = "ParallaxContainer";
-            this.ParallaxContainer.Size = new System.Drawing.Size(970, 401);
-            this.ParallaxContainer.TabIndex = 0;
             // 
             // CalibrationBoard
             // 
@@ -341,6 +388,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.calibrationSplitContainer)).EndInit();
             this.calibrationSplitContainer.ResumeLayout(false);
             this.VisionBoardTab.ResumeLayout(false);
+            this.VisionBoardTab.PerformLayout();
+            this.toolStrip2.ResumeLayout(false);
+            this.toolStrip2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SetupPictureBox)).EndInit();
             this.ResumeLayout(false);
 
@@ -374,6 +424,10 @@
         private System.Windows.Forms.ComboBox comboBoxCalibrationLeft;
         private Y_Visualization.Drawing.RgbdViewer ParallaxContainer;
         private System.Windows.Forms.PictureBox SetupPictureBox;
+        private System.Windows.Forms.ToolStrip toolStrip2;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel3;
+        private System.Windows.Forms.ToolStripComboBox userSceneScale;
+        private System.Windows.Forms.ToolStripButton averageButton;
     }
 }
 

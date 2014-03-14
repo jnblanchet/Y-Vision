@@ -43,6 +43,8 @@
   <ItemGroup>
     <Compile Include="BlobDescriptor\BlobFilter.cs" />
     <Compile Include="BlobDescriptor\BlobObject.cs" />
+    <Compile Include="BlobDescriptor\BlobFactory.cs" />
+    <Compile Include="BlobDescriptor\FlatBlobObject.cs" />
     <Compile Include="Configuration\ConfigurationManager.cs" />
     <Compile Include="Configuration\ParallaxConfig.cs" />
     <Compile Include="Configuration\SensorConfig.cs" />
@@ -67,11 +69,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SensorStreams\DiscreteRotation.cs" />
     <Compile Include="SensorStreams\KinectSensorContext.cs" />
+    <Compile Include="SensorStreams\SensorContext.cs" />
     <Compile Include="Tracking\BranchAndBound.cs" />
     <Compile Include="Tracking\BranchAndBoundTracker.cs" />
     <Compile Include="Tracking\TrackedObject.cs" />
     <Compile Include="Tracking\TrackableObject.cs" />
     <Compile Include="Tracking\Tracker.cs" />
+    <Compile Include="Tracking\TrackingWeights.cs" />
     <Compile Include="Triangulation\CoordinateSystemTool.cs" />
     <Compile Include="Triangulation\MappingTool.cs" />
     <Compile Include="Triangulation\TriangulationTool.cs" />

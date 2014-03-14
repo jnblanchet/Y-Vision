@@ -30,7 +30,7 @@ namespace Y_Vision.SensorStreams
         public KinectSensorContext Context { get; private set; }
 
         // Old constructor, still used by the debug tool
-        public KinectStreamMicrosoftApi(string uniqueId  = null, DiscreteRotation rotation = null)
+        /*public KinectStreamMicrosoftApi(string uniqueId  = null, DiscreteRotation rotation = null)
         {
             _colorProcessor = new BackgroundWorker();
             _depthProcessor = new BackgroundWorker();
@@ -44,7 +44,7 @@ namespace Y_Vision.SensorStreams
             _chooser.KinectChanged += ChooserSensorChanged;
 
             Context = rotation == null ? new KinectSensorContext(false) : new KinectSensorContext(!rotation.InvertHeightWidth);
-        }
+        }*/
 
         public KinectStreamMicrosoftApi(SensorConfig config)
         {
@@ -77,8 +77,8 @@ namespace Y_Vision.SensorStreams
 
 
             newsensor.SkeletonStream.Disable();
-            newsensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30); // TODO: this should be a config preset obtained in the constructor
-            newsensor.DepthStream.Enable(DepthImageFormat.Resolution320x240Fps30);
+            newsensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30); // TODO: this should be a config preset obtained in the constructor (like depth)
+            newsensor.DepthStream.Enable(Context.DepthConfig);
             newsensor.AllFramesReady += SensorAllFramesReady;
             try
             {
