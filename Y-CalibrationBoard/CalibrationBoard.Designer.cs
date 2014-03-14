@@ -59,6 +59,7 @@
             this.userSceneScale = new System.Windows.Forms.ToolStripComboBox();
             this.averageButton = new System.Windows.Forms.ToolStripButton();
             this.SetupPictureBox = new System.Windows.Forms.PictureBox();
+            this.PrintPointsButton = new System.Windows.Forms.ToolStripButton();
             this.tabControl.SuspendLayout();
             this.SensorSetupTab.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -320,7 +321,8 @@
             this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripLabel3,
             this.userSceneScale,
-            this.averageButton});
+            this.averageButton,
+            this.PrintPointsButton});
             this.toolStrip2.Location = new System.Drawing.Point(0, 0);
             this.toolStrip2.Name = "toolStrip2";
             this.toolStrip2.Size = new System.Drawing.Size(976, 25);
@@ -365,6 +367,16 @@
             this.SetupPictureBox.Size = new System.Drawing.Size(976, 436);
             this.SetupPictureBox.TabIndex = 0;
             this.SetupPictureBox.TabStop = false;
+            // 
+            // PrintPointsButton
+            // 
+            this.PrintPointsButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.PrintPointsButton.Image = ((System.Drawing.Image)(resources.GetObject("PrintPointsButton.Image")));
+            this.PrintPointsButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.PrintPointsButton.Name = "PrintPointsButton";
+            this.PrintPointsButton.Size = new System.Drawing.Size(23, 22);
+            this.PrintPointsButton.Text = "Print Points";
+            this.PrintPointsButton.Click += new System.EventHandler(this.PrintPointsButtonClick);
             // 
             // CalibrationBoard
             // 
@@ -428,6 +440,7 @@
         private System.Windows.Forms.ToolStripLabel toolStripLabel3;
         private System.Windows.Forms.ToolStripComboBox userSceneScale;
         private System.Windows.Forms.ToolStripButton averageButton;
+        private System.Windows.Forms.ToolStripButton PrintPointsButton;
     }
 }
 

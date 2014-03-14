@@ -115,10 +115,14 @@ namespace Y_Vision.Configuration
 
             for (int i = 0; i < iterations; i++)
             {
-                var newPoint = conv.ToXyz(p2D[i].X, p2D[i].Y, depth[(int) p2D[i].Y,(int) p2D[i].X], h, w);
-                p3D[i] = new Point3D((p3D[i].X*weightCurrent + newPoint.X * weightNew)/(weightCurrent + weightNew),
-                                     (p3D[i].Y*weightCurrent + newPoint.Y * weightNew)/(weightCurrent + weightNew),
-                                     (p3D[i].Z*weightCurrent + newPoint.Z * weightNew)/(weightCurrent + weightNew));
+                var Z = depth[(int) p2D[i].Y, (int) p2D[i].X];
+                if(Z >0)
+                {
+                    var newPoint = conv.ToXyz(p2D[i].X, p2D[i].Y, Z, h, w);
+                    p3D[i] = new Point3D((p3D[i].X*weightCurrent + newPoint.X*weightNew)/(weightCurrent + weightNew),
+                                         (p3D[i].Y*weightCurrent + newPoint.Y*weightNew)/(weightCurrent + weightNew),
+                                         (p3D[i].Z*weightCurrent + newPoint.Z*weightNew)/(weightCurrent + weightNew));
+                }
             }
         }
     }

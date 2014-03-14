@@ -257,9 +257,8 @@ namespace Y_CalibrationBoard
                             ParallaxContainer.DisplayFrames(_parallaxLeftBmp.DepthBitamp, null);
                             if(_averageModeLeft > 0)
                             {
-                                _averageModeLeft--;
                                 _configs.ParallaxConfig.SmoothAllPoints(conf.SensorId, _parallaxLeft.Depth2D, FrameCountAverageMode - _averageModeLeft, 1, _convL);
-                                DrawScene();
+                                _averageModeLeft--;
                             }
                                 
                         };
@@ -280,9 +279,10 @@ namespace Y_CalibrationBoard
                             DrawTrackedPeople();
                             if (_averageModeRight > 0)
                             {
-                                _averageModeRight--;
                                 _configs.ParallaxConfig.SmoothAllPoints(conf.SensorId, _parallaxRight.Depth2D, FrameCountAverageMode - _averageModeRight, 1, _convR);
-                                DrawScene();
+                                _averageModeRight--;
+                                if (_averageModeRight == 0)
+                                    DrawScene();
                             }
                         };
                 _convR = new CoordinateSystemConverter(_parallaxLeft.Context);
@@ -412,8 +412,6 @@ namespace Y_CalibrationBoard
         }
         #endregion
 
-        // TODO: multisample mode that averages all points over 30 frames!!!
-
         private void UserSceneScaleSelectedIndexChanged(object sender, EventArgs e)
         {
             DrawScene();
@@ -430,6 +428,11 @@ namespace Y_CalibrationBoard
         {
             _averageModeLeft = 0;
             _averageModeRight = 0;
+        }
+
+        private void PrintPointsButtonClick(object sender, EventArgs e)
+        {
+            MessageBox.Show(_configs.ParallaxConfig.ToString(), "Parallax configuration", MessageBoxButtons.OK);
         }
     }
 }
