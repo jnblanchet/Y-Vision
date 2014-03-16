@@ -48,8 +48,8 @@ namespace Y_API.DetectionAPI.MessageObjects
                 throw new ArgumentException("Cannot decode the string '" + code + "' as a Person.");
             }
 
-            VelocityX = float.Parse(val[0]) * 320.0f;
-            VelocityY = float.Parse(val[1]) * 240.0f;
+            VelocityX = float.Parse(val[0]);
+            VelocityY = float.Parse(val[1]);
             VelocityZ = float.Parse(val[2]);
             Age = int.Parse(val[3]);
             LastSeen = int.Parse(val[4]);
