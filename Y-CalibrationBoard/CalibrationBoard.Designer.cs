@@ -58,8 +58,25 @@
             this.toolStripLabel3 = new System.Windows.Forms.ToolStripLabel();
             this.userSceneScale = new System.Windows.Forms.ToolStripComboBox();
             this.averageButton = new System.Windows.Forms.ToolStripButton();
-            this.SetupPictureBox = new System.Windows.Forms.PictureBox();
             this.PrintPointsButton = new System.Windows.Forms.ToolStripButton();
+            this.SetupPictureBox = new System.Windows.Forms.PictureBox();
+            this.DisplayTabPage = new System.Windows.Forms.TabPage();
+            this.label9 = new System.Windows.Forms.Label();
+            this.numericUpDownE = new System.Windows.Forms.NumericUpDown();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.numericUpDownD = new System.Windows.Forms.NumericUpDown();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.numericUpDownC = new System.Windows.Forms.NumericUpDown();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.numericUpDownB = new System.Windows.Forms.NumericUpDown();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.numericUpDownA = new System.Windows.Forms.NumericUpDown();
+            this.label1 = new System.Windows.Forms.Label();
+            this.distanceSetupPictureBox = new System.Windows.Forms.PictureBox();
             this.tabControl.SuspendLayout();
             this.SensorSetupTab.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -71,6 +88,13 @@
             this.VisionBoardTab.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SetupPictureBox)).BeginInit();
+            this.DisplayTabPage.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownE)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownD)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownC)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownB)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownA)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.distanceSetupPictureBox)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl
@@ -78,6 +102,7 @@
             this.tabControl.Controls.Add(this.SensorSetupTab);
             this.tabControl.Controls.Add(this.CalibrationTab);
             this.tabControl.Controls.Add(this.VisionBoardTab);
+            this.tabControl.Controls.Add(this.DisplayTabPage);
             this.tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl.Location = new System.Drawing.Point(0, 0);
             this.tabControl.Name = "tabControl";
@@ -356,17 +381,8 @@
             this.averageButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.averageButton.Name = "averageButton";
             this.averageButton.Size = new System.Drawing.Size(23, 22);
-            this.averageButton.Text = "Average";
+            this.averageButton.Text = "Auto average points";
             this.averageButton.Click += new System.EventHandler(this.AverageButtonClick);
-            // 
-            // SetupPictureBox
-            // 
-            this.SetupPictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SetupPictureBox.Location = new System.Drawing.Point(0, 0);
-            this.SetupPictureBox.Name = "SetupPictureBox";
-            this.SetupPictureBox.Size = new System.Drawing.Size(976, 436);
-            this.SetupPictureBox.TabIndex = 0;
-            this.SetupPictureBox.TabStop = false;
             // 
             // PrintPointsButton
             // 
@@ -377,6 +393,208 @@
             this.PrintPointsButton.Size = new System.Drawing.Size(23, 22);
             this.PrintPointsButton.Text = "Print Points";
             this.PrintPointsButton.Click += new System.EventHandler(this.PrintPointsButtonClick);
+            // 
+            // SetupPictureBox
+            // 
+            this.SetupPictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SetupPictureBox.Location = new System.Drawing.Point(0, 0);
+            this.SetupPictureBox.Name = "SetupPictureBox";
+            this.SetupPictureBox.Size = new System.Drawing.Size(976, 436);
+            this.SetupPictureBox.TabIndex = 0;
+            this.SetupPictureBox.TabStop = false;
+            // 
+            // DisplayTabPage
+            // 
+            this.DisplayTabPage.Controls.Add(this.label9);
+            this.DisplayTabPage.Controls.Add(this.numericUpDownE);
+            this.DisplayTabPage.Controls.Add(this.label10);
+            this.DisplayTabPage.Controls.Add(this.label7);
+            this.DisplayTabPage.Controls.Add(this.numericUpDownD);
+            this.DisplayTabPage.Controls.Add(this.label8);
+            this.DisplayTabPage.Controls.Add(this.label5);
+            this.DisplayTabPage.Controls.Add(this.numericUpDownC);
+            this.DisplayTabPage.Controls.Add(this.label6);
+            this.DisplayTabPage.Controls.Add(this.label3);
+            this.DisplayTabPage.Controls.Add(this.numericUpDownB);
+            this.DisplayTabPage.Controls.Add(this.label4);
+            this.DisplayTabPage.Controls.Add(this.label2);
+            this.DisplayTabPage.Controls.Add(this.numericUpDownA);
+            this.DisplayTabPage.Controls.Add(this.label1);
+            this.DisplayTabPage.Controls.Add(this.distanceSetupPictureBox);
+            this.DisplayTabPage.Location = new System.Drawing.Point(4, 22);
+            this.DisplayTabPage.Name = "DisplayTabPage";
+            this.DisplayTabPage.Size = new System.Drawing.Size(976, 436);
+            this.DisplayTabPage.TabIndex = 3;
+            this.DisplayTabPage.Text = "Display Calibration";
+            this.DisplayTabPage.UseVisualStyleBackColor = true;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(87, 112);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(23, 13);
+            this.label9.TabIndex = 15;
+            this.label9.Text = "mm";
+            // 
+            // numericUpDownE
+            // 
+            this.numericUpDownE.Location = new System.Drawing.Point(27, 106);
+            this.numericUpDownE.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownE.Name = "numericUpDownE";
+            this.numericUpDownE.Size = new System.Drawing.Size(59, 20);
+            this.numericUpDownE.TabIndex = 14;
+            this.numericUpDownE.ValueChanged += new System.EventHandler(this.NumericUpDownValueChanged);
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(5, 110);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(14, 13);
+            this.label10.TabIndex = 13;
+            this.label10.Text = "E";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(87, 86);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(23, 13);
+            this.label7.TabIndex = 12;
+            this.label7.Text = "mm";
+            // 
+            // numericUpDownD
+            // 
+            this.numericUpDownD.Location = new System.Drawing.Point(27, 80);
+            this.numericUpDownD.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownD.Name = "numericUpDownD";
+            this.numericUpDownD.Size = new System.Drawing.Size(59, 20);
+            this.numericUpDownD.TabIndex = 11;
+            this.numericUpDownD.ValueChanged += new System.EventHandler(this.NumericUpDownValueChanged);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(5, 84);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(15, 13);
+            this.label8.TabIndex = 10;
+            this.label8.Text = "D";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(87, 60);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(23, 13);
+            this.label5.TabIndex = 9;
+            this.label5.Text = "mm";
+            // 
+            // numericUpDownC
+            // 
+            this.numericUpDownC.Location = new System.Drawing.Point(27, 54);
+            this.numericUpDownC.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownC.Name = "numericUpDownC";
+            this.numericUpDownC.Size = new System.Drawing.Size(59, 20);
+            this.numericUpDownC.TabIndex = 8;
+            this.numericUpDownC.ValueChanged += new System.EventHandler(this.NumericUpDownValueChanged);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(5, 58);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(14, 13);
+            this.label6.TabIndex = 7;
+            this.label6.Text = "C";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(87, 34);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(23, 13);
+            this.label3.TabIndex = 6;
+            this.label3.Text = "mm";
+            // 
+            // numericUpDownB
+            // 
+            this.numericUpDownB.Location = new System.Drawing.Point(27, 28);
+            this.numericUpDownB.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownB.Name = "numericUpDownB";
+            this.numericUpDownB.Size = new System.Drawing.Size(59, 20);
+            this.numericUpDownB.TabIndex = 5;
+            this.numericUpDownB.ValueChanged += new System.EventHandler(this.NumericUpDownValueChanged);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(5, 32);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(14, 13);
+            this.label4.TabIndex = 4;
+            this.label4.Text = "B";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(87, 8);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(23, 13);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "mm";
+            // 
+            // numericUpDownA
+            // 
+            this.numericUpDownA.Location = new System.Drawing.Point(27, 2);
+            this.numericUpDownA.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownA.Name = "numericUpDownA";
+            this.numericUpDownA.Size = new System.Drawing.Size(59, 20);
+            this.numericUpDownA.TabIndex = 2;
+            this.numericUpDownA.ValueChanged += new System.EventHandler(this.NumericUpDownValueChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(5, 6);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(14, 13);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "A";
+            // 
+            // distanceSetupPictureBox
+            // 
+            this.distanceSetupPictureBox.BackgroundImage = global::Y_CalibrationBoard.Properties.Resources.setup;
+            this.distanceSetupPictureBox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.distanceSetupPictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.distanceSetupPictureBox.InitialImage = null;
+            this.distanceSetupPictureBox.Location = new System.Drawing.Point(0, 0);
+            this.distanceSetupPictureBox.Name = "distanceSetupPictureBox";
+            this.distanceSetupPictureBox.Size = new System.Drawing.Size(976, 436);
+            this.distanceSetupPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.distanceSetupPictureBox.TabIndex = 0;
+            this.distanceSetupPictureBox.TabStop = false;
             // 
             // CalibrationBoard
             // 
@@ -404,6 +622,14 @@
             this.toolStrip2.ResumeLayout(false);
             this.toolStrip2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SetupPictureBox)).EndInit();
+            this.DisplayTabPage.ResumeLayout(false);
+            this.DisplayTabPage.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownE)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownD)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownC)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownB)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownA)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.distanceSetupPictureBox)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -441,6 +667,23 @@
         private System.Windows.Forms.ToolStripComboBox userSceneScale;
         private System.Windows.Forms.ToolStripButton averageButton;
         private System.Windows.Forms.ToolStripButton PrintPointsButton;
+        private System.Windows.Forms.TabPage DisplayTabPage;
+        private System.Windows.Forms.PictureBox distanceSetupPictureBox;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.NumericUpDown numericUpDownE;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.NumericUpDown numericUpDownD;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.NumericUpDown numericUpDownC;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.NumericUpDown numericUpDownB;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.NumericUpDown numericUpDownA;
+        private System.Windows.Forms.Label label1;
     }
 }
 

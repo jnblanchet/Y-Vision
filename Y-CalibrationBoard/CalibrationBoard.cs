@@ -4,7 +4,9 @@ using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.Kinect.Toolkit;
+using Y_Vision.BlobDescriptor;
 using Y_Vision.Configuration;
+using Y_Vision.Core;
 using Y_Vision.GroundRemoval;
 using Y_Vision.PipeLine;
 using Y_Vision.SensorStreams;
@@ -73,6 +75,8 @@ namespace Y_CalibrationBoard
                 GroundThresholdTextBox.Enabled = true;
 
                 _detector = new HumanDetectorPipeline(_currentConfig);
+                _detector.BlobFactory = new BlobFactory { Context = _detector.Context, Conv = new CoordinateSystemConverter(_detector.Context) };
+
                 _detector.DetectionUpdate += (o, args) =>
                                                  {
                                                      toolStripFpsLabel.Text = String.Format("{0} FPS", _detector.Fps);
@@ -219,6 +223,8 @@ namespace Y_CalibrationBoard
                                                        }
                                                        DrawScene();
                                                    };
+
+            LoadNumericparams();
         }
 
         /// <summary>
@@ -250,6 +256,7 @@ namespace Y_CalibrationBoard
                     _parallaxLeft.Stop();
                 var conf = _configs.GetConfigById(comboBoxCalibrationLeft.Text);
                 _parallaxLeft = new HumanDetectorPipeline(conf);
+                _parallaxLeft.BlobFactory = new BlobFactory { Context = _parallaxLeft.Context, Conv = new CoordinateSystemConverter(_parallaxLeft.Context) };
                 _parallaxLeft.DetectionUpdate += (o, args) =>
                         {
                             _parallaxLeftBmp.CreateBitmapFromDepthFrame(_parallaxLeft.RawDepth,_parallaxLeft.DepthH,_parallaxLeft.DepthW);
@@ -271,6 +278,7 @@ namespace Y_CalibrationBoard
                     _parallaxRight.Stop();
                 var conf = _configs.GetConfigById(comboBoxCalibrationRight.Text);
                 _parallaxRight = new HumanDetectorPipeline(conf);
+                _parallaxRight.BlobFactory = new BlobFactory { Context = _parallaxRight.Context, Conv = new CoordinateSystemConverter(_parallaxRight.Context) };
                 _parallaxRight.DetectionUpdate += (o, args) =>
                         {
                             _parallaxRightBmp.CreateBitmapFromDepthFrame(_parallaxRight.RawDepth,_parallaxRight.DepthH,_parallaxRight.DepthW);
@@ -359,7 +367,8 @@ namespace Y_CalibrationBoard
                 // Draw Left sensor tracked objects
                 foreach (var obj in _parallaxLeft.DepthTrackedObjects)
                 {
-                    var p = _convL.ToXyz(obj.X, obj.Y, obj.Z, _parallaxLeftBmp.DepthBitamp.Width, _parallaxLeftBmp.DepthBitamp.Height);
+                    //var p = _convL.ToXyz(obj.X, obj.Y, obj.Z, _parallaxLeftBmp.DepthBitamp.Width, _parallaxLeftBmp.DepthBitamp.Height);
+                    var p = new Point3D(obj.X, obj.Y, obj.Z);
                     var normalizedP = _mappingTool.GetNormalizedCoordinates(0,p);
                     if (normalizedP.HasValue)
                     {
@@ -384,7 +393,8 @@ namespace Y_CalibrationBoard
                 // Draw Right sensor tracked objects
                 foreach (var obj in _parallaxRight.DepthTrackedObjects)
                 {
-                    var p = _convR.ToXyz(obj.X, obj.Y, obj.Z, _parallaxRightBmp.DepthBitamp.Width, _parallaxRightBmp.DepthBitamp.Height);
+                    //var p = _convR.ToXyz(obj.X, obj.Y, obj.Z, _parallaxRightBmp.DepthBitamp.Width, _parallaxRightBmp.DepthBitamp.Height);
+                    var p = new Point3D(obj.X,obj.Y,obj.Z);
                     var normalizedP = _mappingTool.GetNormalizedCoordinates(1, p);
                     if (normalizedP.HasValue)
                     {
@@ -433,6 +443,27 @@ namespace Y_CalibrationBoard
         private void PrintPointsButtonClick(object sender, EventArgs e)
         {
             MessageBox.Show(_configs.ParallaxConfig.ToString(), "Parallax configuration", MessageBoxButtons.OK);
+        }
+
+        private void NumericUpDownValueChanged(object sender, EventArgs e)
+        {
+            switch (((NumericUpDown)sender).Name.Last())
+            {
+                case 'A': _configs.ParallaxConfig.LeftPadding = (int)numericUpDownA.Value; break;
+                case 'B': _configs.ParallaxConfig.DisplayWidth = (int) numericUpDownB.Value; break;
+                case 'C': _configs.ParallaxConfig.RightPadding = (int) numericUpDownC.Value; break;
+                case 'D': _configs.ParallaxConfig.DisplayHeight = (int) numericUpDownD.Value; break;
+                case 'E': _configs.ParallaxConfig.DisplayDistanceFromGround = (int) numericUpDownE.Value; break;
+            }
+        }
+
+        private void LoadNumericparams()
+        {
+            numericUpDownA.Value = _configs.ParallaxConfig.LeftPadding;
+            numericUpDownB.Value = _configs.ParallaxConfig.DisplayWidth;
+            numericUpDownC.Value = _configs.ParallaxConfig.RightPadding;
+            numericUpDownD.Value = _configs.ParallaxConfig.DisplayHeight;
+            numericUpDownE.Value = _configs.ParallaxConfig.DisplayDistanceFromGround;
         }
     }
 }
