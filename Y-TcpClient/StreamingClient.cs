@@ -8,34 +8,14 @@ namespace Y_TcpClient
 {
     public partial class StreamingClient : Form
     {
-        private readonly StreamClientSender _streamClientSender;
-        private readonly StringProtocol _protocol;
-        private readonly SingleSensor2DHumanDetector _singleSensor2DHumanDetector;
+        private StreamClientSender _streamClientSender;
+        private StringProtocol _protocol;
+        private HumanDetector _detector;
 
 
         public StreamingClient()
         {
             InitializeComponent();
-
-            _streamClientSender = new StreamClientSender();
-            _protocol = new StringProtocol();
-            _singleSensor2DHumanDetector = new SingleSensor2DHumanDetector();
-
-            _singleSensor2DHumanDetector.AllPeopleUpdated += (sender, args) =>
-            {
-                
-                var data = (_singleSensor2DHumanDetector.DetectedPeople.Count > 0) ? 
-                    _protocol.Encode(_singleSensor2DHumanDetector.DetectedPeople) :
-                    _protocol.Encode(new []{ new EmptyFrameMessage() });
-
-                if(_streamClientSender.SendAsync(data))
-                    AddLine("[connected] data encoded: " + data);
-                else
-                    AddLine("[not connected] data encoded: " + data);
-            };
-
-            _singleSensor2DHumanDetector.Start();
-
         }
 
 
@@ -48,10 +28,55 @@ namespace Y_TcpClient
             EventListBox.Items.Add(line);
         }
 
+        private void StopEverything()
+        {            
+            if(_detector != null)
+                _detector.Stop();
+            if(_streamClientSender!= null)
+                _streamClientSender.CloseConnection();
+        }
+
         private void StreamingClientFormClosing(object sender, FormClosingEventArgs e)
         {
-            _singleSensor2DHumanDetector.Stop();
+            _detector.Stop();
             _streamClientSender.CloseConnection();
+        }
+
+        private void TwoDSingleSensorToolStripMenuItemClick(object sender, EventArgs e)
+        {
+            StopEverything();
+            _streamClientSender = new StreamClientSender();
+            _protocol = new StringProtocol();
+            _detector = new SingleSensor2DHumanDetector();
+
+            _detector.AllPeopleUpdated += DetectorOnAllPeopleUpdated;
+
+            _detector.Start();
+        }
+
+        private void DetectorOnAllPeopleUpdated(object sender, EventArgs eventArgs)
+        {
+
+                var data = (_detector.DetectedPeople.Count > 0) ?
+                    _protocol.Encode(_detector.DetectedPeople) :
+                    _protocol.Encode(new[] { new EmptyFrameMessage() });
+
+                if (_streamClientSender.SendAsync(data))
+                    AddLine("[connected] data encoded: " + data);
+                else
+                    AddLine("[not connected] data encoded: " + data);
+        }
+
+        private void ThreeDParallaxToolStripMenuItemClick(object sender, EventArgs e)
+        {
+            StopEverything();
+            _streamClientSender = new StreamClientSender();
+            _protocol = new StringProtocol();
+            _detector = new ParallaxHumanDetector(null);
+
+            _detector.AllPeopleUpdated += DetectorOnAllPeopleUpdated;
+
+            _detector.Start();
         }
 
     }
