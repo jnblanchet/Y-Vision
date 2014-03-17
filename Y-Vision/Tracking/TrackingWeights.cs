@@ -14,6 +14,8 @@ namespace Y_Vision.Tracking
                 return 10;
             if (t.GetType() == typeof(FlatBlobObject))
                 return 1;
+            if (t.GetType() == typeof(TrackedObject))
+                return 1;
             throw new Exception("The new blob type is not associated with any weights!");
         }
 
@@ -23,6 +25,8 @@ namespace Y_Vision.Tracking
                 return 2;
             if (t.GetType() == typeof(FlatBlobObject))
                 return 20;
+            if (t.GetType() == typeof(TrackedObject))
+                return 2;
             throw new Exception("The new blob type is not associated with any weights!");
         }
     }

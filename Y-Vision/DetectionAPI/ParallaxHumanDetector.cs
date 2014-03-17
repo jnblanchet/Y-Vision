@@ -14,7 +14,7 @@ namespace Y_Vision.DetectionAPI
 {
     public class ParallaxHumanDetector : HumanDetector
     {
-        private readonly ConfigurationManager _configManager;
+        private readonly ConfigurationManager _manager;
         private readonly SensorConfig _firstConfig, _secondConfig;
         private readonly HumanDetectorPipeline _firstDetector, _secondDetector;
         private readonly MappingTool _mappingTool;
@@ -22,34 +22,55 @@ namespace Y_Vision.DetectionAPI
         private readonly BranchAndBoundMatcher _matcher; // Used to merge the two sensors (no notion of tracking/persistence)
         private readonly BranchAndBoundTracker _tracker; // Used to tracked the resulting merged objects (with persistence)
 
-        public ParallaxHumanDetector(ConfigurationManager manager, string firstSensor, string secondSensor)
+        //TODO: remove the optionnal values and include a ui to select options
+        public ParallaxHumanDetector(ConfigurationManager config, string firstSensor = null, string secondSensor = null)
         {
-            _configManager = manager;
+            //load config
+            if (config == null)
+            {
+                _manager = new ConfigurationManager();
+            }
+            else
+            {
+                _manager = config;
+            }
+            // Load parallax config
+            if(firstSensor == null || secondSensor == null)
+            {
+                try
+                {
+                    firstSensor = _manager.ParallaxConfig.GetSensorId()[0];
+                    secondSensor = _manager.ParallaxConfig.GetSensorId()[1];
+                }catch(Exception e)
+                {
+                    throw new NullReferenceException("No valid config file was found!");
+                }
+            }
 
             // Create MappingTool: a Triangulation tool must first be created since only the calibration points are available in the config file (TODO: FIX)
             var t = new TriangulationTool(2);
-            var pointsFirst = _configManager.ParallaxConfig.Get3DPoints(firstSensor);
-            var pointsSecond = _configManager.ParallaxConfig.Get3DPoints(secondSensor);
+            var pointsFirst = _manager.ParallaxConfig.Get3DPoints(firstSensor);
+            var pointsSecond = _manager.ParallaxConfig.Get3DPoints(secondSensor);
             foreach (var p in pointsFirst)
                 t.AddTriangulationPoint(0, p.X, p.Y, p.Z);
             foreach (var p in pointsSecond)
                 t.AddTriangulationPoint(1, p.X, p.Y, p.Z);
 
             _mappingTool = new MappingTool(t);
-            _mappingTool.InitializeProjection(manager.ParallaxConfig.LeftPadding,
-                                                manager.ParallaxConfig.DisplayWidth,
-                                                manager.ParallaxConfig.RightPadding,
-                                                manager.ParallaxConfig.DisplayHeight,
-                                                manager.ParallaxConfig.DisplayDistanceFromGround);
+            _mappingTool.InitializeProjection(_manager.ParallaxConfig.LeftPadding,
+                                                _manager.ParallaxConfig.DisplayWidth,
+                                                _manager.ParallaxConfig.RightPadding,
+                                                _manager.ParallaxConfig.DisplayHeight,
+                                                _manager.ParallaxConfig.DisplayDistanceFromGround);
 
             // Create pipelines
-            _firstConfig = manager.GetConfigById(firstSensor);
-            _secondConfig = manager.GetConfigById(secondSensor);
+            _firstConfig = _manager.GetConfigById(firstSensor);
+            _secondConfig = _manager.GetConfigById(secondSensor);
 
             _firstDetector = new HumanDetectorPipeline(_firstConfig);
             _firstDetector.BlobFactory = new BlobFactory { Context = _firstDetector.Context, Conv = new CoordinateSystemConverter(_firstDetector.Context), MappingTool = _mappingTool, SensorId = 0};
             _secondDetector = new HumanDetectorPipeline(_secondConfig);
-            _firstDetector.BlobFactory = new BlobFactory { Context = _secondDetector.Context, Conv = new CoordinateSystemConverter(_secondDetector.Context), MappingTool = _mappingTool, SensorId = 1 };
+            _secondDetector.BlobFactory = new BlobFactory { Context = _secondDetector.Context, Conv = new CoordinateSystemConverter(_secondDetector.Context), MappingTool = _mappingTool, SensorId = 1 };
 
             _matcher = new BranchAndBoundMatcher();
             _tracker = new BranchAndBoundTracker();

@@ -35,7 +35,7 @@ namespace Y_Vision.Triangulation
             // Cache algebra stuff
             // Display Plane (line) ax + bz + c = 0
             double x1 = GetSensorPosX(0), x2 = GetSensorPosX(1);
-            double z1 = GetSensorPosX(1), z2 = GetSensorPosX(2);
+            double z1 = GetSensorPosZ(0), z2 = GetSensorPosZ(1);
 
             _a = (x2 - x1);
             _b = -(z2 - z1);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Y_Vision.Core;
 using Y_Vision.GroundRemoval;
+using System.Linq;
 
 namespace Y_Vision.Configuration
 {
@@ -125,6 +126,11 @@ namespace Y_Vision.Configuration
                                          (p3D[i].Z*weightCurrent + newPoint.Z*weightNew)/(weightCurrent + weightNew));
                 }
             }
+        }
+
+        public string[] GetSensorId()
+        {
+            return _parallaxPoint3DSets.Keys.ToArray();
         }
     }
 }

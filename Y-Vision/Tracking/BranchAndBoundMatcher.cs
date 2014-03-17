@@ -20,7 +20,7 @@ namespace Y_Vision.Tracking
             TrackedObjects.Clear();
 
             TrackedObjects.AddRange(firstSet);
-            GeneratedMatchesAndUpdateTrackedObjects(secondSet);
+            base.GeneratedMatchesAndUpdateTrackedObjects(secondSet);
 
             return TrackedObjects;
         }
