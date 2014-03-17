@@ -29,23 +29,6 @@ namespace Y_Vision.SensorStreams
 
         public KinectSensorContext Context { get; private set; }
 
-        // Old constructor, still used by the debug tool
-        /*public KinectStreamMicrosoftApi(string uniqueId  = null, DiscreteRotation rotation = null)
-        {
-            _colorProcessor = new BackgroundWorker();
-            _depthProcessor = new BackgroundWorker();
-            _depthProcessor.DoWork += (o, args) => SensorDepthFrameReady(_bgThreadArg);
-            _colorProcessor.DoWork += (o, args) => SensorColorFrameReady(_bgThreadArg);
-
-            _config = new SensorConfig(uniqueId);
-            if (rotation != null)
-                _config.Rotation = rotation;
-            _chooser = new KinectSensorChooser();
-            _chooser.KinectChanged += ChooserSensorChanged;
-
-            Context = rotation == null ? new KinectSensorContext(false) : new KinectSensorContext(!rotation.InvertHeightWidth);
-        }*/
-
         public KinectStreamMicrosoftApi(SensorConfig config)
         {
             _config = config;

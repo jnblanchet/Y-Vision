@@ -9,6 +9,7 @@ using Y_Vision.Core;
 using Y_Vision.GroundRemoval;
 using Y_Vision.SensorStreams;
 using Y_Vision.Tracking;
+using Y_Vision.Triangulation;
 
 namespace Y_Vision.PipeLine
 {
@@ -20,10 +21,19 @@ namespace Y_Vision.PipeLine
         // Pipeline
         private readonly KinectStreamMicrosoftApi _kinect;
         private readonly ConnectedComponentLabling _ccl;
-        private readonly BlobFilter _blobFilter;
-        private readonly BlobFactory _blobFactory;
+        private BlobFilter _blobFilter;
         private readonly BranchAndBoundTracker _tracker;
         private readonly PlaneGroundRemover _groundRemover;
+        private BlobFactory _blobFactory;
+        public BlobFactory BlobFactory
+        {
+           private get { return _blobFactory; }
+           set
+            {
+                _blobFactory = value;
+                _blobFilter = new BlobFilter(_blobFactory, _kinect.Context);
+            }
+        }
 
         // Pipieline Artifact
         public List<TrackedObject> DepthTrackedObjects { private set; get; }
@@ -51,8 +61,7 @@ namespace Y_Vision.PipeLine
         /// Creates a pipeline that will use a sensor to trigger detection events
         /// </summary>
         /// <param name="config">The sensor configuration.</param>
-        /// <param name="blobFactory">This parameter is optionnal. By default the new 3D system will be used (the old system with onscreen, flat, 2D coordinate should be specified explicitely)</param>
-        public HumanDetectorPipeline(SensorConfig config, BlobFactory blobFactory = null)
+        public HumanDetectorPipeline(SensorConfig config)
         {
             _sw = new Stopwatch();
             _ccl = new ConnectedComponentLabling();
@@ -61,18 +70,14 @@ namespace Y_Vision.PipeLine
             _kinect = new KinectStreamMicrosoftApi(config);
             _groundRemover = new PlaneGroundRemover(_kinect.Context, config);
             Config = config;
-
-            if(blobFactory == null)
-                _blobFactory = new BlobFactory(new CoordinateSystemConverter(_kinect.Context), _kinect.Context);
-            else
-                _blobFactory = blobFactory;
-
-            _blobFilter = new BlobFilter(_blobFactory, _kinect.Context);
         }
-
+        //_blobFactory = new BlobFactory(new CoordinateSystemConverter(_kinect.Context), _kinect.Context);
 
         public void Start()
         {
+            if(BlobFactory == null)
+                throw new ArgumentNullException("A blob factory must be specified before starting the detector.");
+
             // Multithread stream processing
             _depthProcessor = new BackgroundWorker();
             _colorProcessor = new BackgroundWorker();

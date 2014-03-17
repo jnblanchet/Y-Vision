@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Y_Vision.ConnectedComponentLabeling;
+using Y_Vision.Core;
 using Y_Vision.GroundRemoval;
 
 namespace Y_Vision.BlobDescriptor

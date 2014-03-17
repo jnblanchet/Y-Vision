@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Y_Vision.Tracking
 {
@@ -66,40 +63,46 @@ namespace Y_Vision.Tracking
             VelocityX *= 0.95;
             DistanceZ += OnscreenVelocityZ;
             DistanceZ *= 0.75;
+            
+            if(OnAttributesUpdate!= null)
+                OnAttributesUpdate.Invoke(this,new EventArgs());
         }
 
-        internal void UpdateTrackedFrame(TrackableObject obj)
+        // For blobs and detection
+        public void UpdateTrackedFrame(TrackableObject other)
         {
             Age++;
             LastSeen = 0;
 
-            OnscreenVelocityX = OnscreenVelocityX * 0.5 + (obj.OnscreenX - OnscreenX) * 0.5;
-            OnscreenVelocityZ = OnscreenVelocityZ * 0.5 + (obj.DistanceZ - DistanceZ) * 0.5;
+            OnscreenVelocityX = OnscreenVelocityX * 0.5 + (other.OnscreenX - OnscreenX) * 0.5;
+            OnscreenVelocityZ = OnscreenVelocityZ * 0.5 + (other.DistanceZ - DistanceZ) * 0.5;
 
-            VelocityX = VelocityX * 0.3 + (obj.X - X) * 0.7;
-            VelocityY = VelocityY * 0.5 + (obj.Y - Y) * 0.5;
-            VelocityZ = VelocityZ * 0.3 + (obj.Z - Z) * 0.7;
+            VelocityX = VelocityX * 0.5 + (other.X - X) * 0.5;
+            VelocityY = VelocityY * 0.5 + (other.Y - Y) * 0.5;
+            VelocityZ = VelocityZ * 0.5 + (other.Z - Z) * 0.5;
 
             // For display mostly
-            OnscreenX = (int) (OnscreenX * 0.5 + obj.OnscreenX * 0.5);
-            OnscreenY = (int) (OnscreenY * 0.5 + obj.OnscreenY * 0.5);
-            DistanceZ = (int) (DistanceZ * 0.5 + obj.DistanceZ * 0.5);
+            OnscreenX = (int) (OnscreenX * 0.5 + other.OnscreenX * 0.5);
+            OnscreenY = (int) (OnscreenY * 0.5 + other.OnscreenY * 0.5);
+            DistanceZ = (int) (DistanceZ * 0.5 + other.DistanceZ * 0.5);
 
-            X = (X * 0.5 + obj.X * 0.5);
-            Y = (Y * 0.5 + obj.Y * 0.5);
-            Z = (Z * 0.5 + obj.Z * 0.5);
+            X = (X * 0.5 + other.X * 0.5);
+            Y = (Y * 0.5 + other.Y * 0.5);
+            Z = (Z * 0.5 + other.Z * 0.5);
 
-            MaxX = (int) (MaxX * 0.5 + obj.MaxX * 0.5);
-            MinX = (int)(MinX * 0.5 + obj.MinX * 0.5);
-            MaxY = (int) (MaxY * 0.5 + obj.MaxY * 0.5);
-            MinY = (int)(MinY * 0.5 + obj.MinY * 0.5);
+            MaxX = (int) (MaxX * 0.5 + other.MaxX * 0.5);
+            MinX = (int)(MinX * 0.5 + other.MinX * 0.5);
+            MaxY = (int) (MaxY * 0.5 + other.MaxY * 0.5);
+            MinY = (int)(MinY * 0.5 + other.MinY * 0.5);
 
-            Surface = (int)(Surface * 0.7 + obj.Surface * 0.3);
+            Surface = (int)(Surface * 0.5 + other.Surface * 0.5);
+
+            if (OnAttributesUpdate != null)
+                OnAttributesUpdate.Invoke(this, new EventArgs());
         }
 
         public override int ComputeDistanceWith(TrackableObject other)
         {
-            // random divisions for weights TODO: FIX WEIGTHS
             return (int)Math.Pow(other.X - (X + VelocityX), 2)
                    + (int)Math.Pow(other.Y - (Y + VelocityY), 2)
                    + (int)Math.Pow((other.Z - (Z + VelocityZ)) / TrackingWeights.GetWeightZ(other), 2)
@@ -110,5 +113,7 @@ namespace Y_Vision.Tracking
         {
             return this;
         }
+
+        public event EventHandler<EventArgs> OnAttributesUpdate;
     }
 }

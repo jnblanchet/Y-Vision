@@ -2,6 +2,7 @@
 using Y_Vision.GroundRemoval;
 using Y_Vision.SensorStreams;
 using Y_Vision.Tracking;
+using Y_Vision.Triangulation;
 
 namespace Y_Vision.BlobDescriptor
 {
@@ -12,22 +13,28 @@ namespace Y_Vision.BlobDescriptor
     /// </summary>
     public class BlobFactory
     {
-        private readonly CoordinateSystemConverter _conv;
-        private readonly SensorContext _context;
-
-        // TODO: a builder pattern will be needed for this object to be extensible
-        public BlobFactory(CoordinateSystemConverter conv = null, SensorContext context = null)
-        {
-            _conv = conv;
-            _context = context;
-        }
+        // Builder pattern.
+        public CoordinateSystemConverter Conv; // turns the 2d into 3d
+        public SensorContext Context;
+        public MappingTool MappingTool;
+        public int SensorId;
 
         public TrackableObject CreateBlob(ConnectedComponentLabling.Blob b)
         {
-            if (_conv != null || _context != null)
-                return new BlobObject(b, _conv, _context.DepthHeight, _context.DepthWidth);
+            TrackableObject trackableObject;
+            
+            if (Conv != null || Context != null)
+                trackableObject = new BlobObject(b, Conv, Context.DepthHeight, Context.DepthWidth);
+            else
+                trackableObject = new FlatBlobObject(b);
 
-            return new FlatBlobObject(b);
+            if (MappingTool != null)
+            {
+                var newPoint = MappingTool.GetNormalizedCoordinates(SensorId, trackableObject.X, trackableObject.Y, trackableObject.Z);
+                trackableObject.ChangeCoordiateSystem(newPoint.Value);
+            }
+
+            return trackableObject;
         }
     }
 }

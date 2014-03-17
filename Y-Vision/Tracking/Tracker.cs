@@ -19,7 +19,7 @@ namespace Y_Vision.Tracking
             TrackedObjects = new List<TrackedObject>();
         }
 
-        public List<TrackedObject> TrackObjects(IEnumerable<TrackableObject> newObjects)
+        public virtual List<TrackedObject> TrackObjects(IEnumerable<TrackableObject> newObjects)
         {
             // new Tracking frame: increment age of all old frames
             TrackedObjects.ForEach(o => o.PrepareForNewTrackingFrame());

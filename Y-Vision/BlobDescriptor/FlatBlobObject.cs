@@ -26,7 +26,7 @@ namespace Y_Vision.BlobDescriptor
             Surface = blob.Count;
         }
 
-
+        // Not implemented
         public override int ComputeDistanceWith(TrackableObject other)
         {
             throw new NotImplementedException();
@@ -37,12 +37,10 @@ namespace Y_Vision.BlobDescriptor
             return new TrackedObject(X, Y, Z, OnscreenX, OnscreenY, DistanceZ, MaxX, MinX, MaxY, MinY,Surface);
         }
 
-      
-
         public override string ToString()
         {
-            return String.Format("Blob at ({0},{1}) with size ({2},{3}) and total surface = {4}", X, Y,
-                                 MaxX - MinX, MaxY - MinY, Surface);
+            return String.Format("{5} at ({0},{1}) with size ({2},{3}) and total surface = {4}", X, Y,
+                                 MaxX - MinX, MaxY - MinY, Surface, GetType());
         }
     }
 }

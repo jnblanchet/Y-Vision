@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Y_API.DetectionAPI;
 using Y_API.DetectionAPI.MessageObjects;
+using Y_Vision.BlobDescriptor;
 using Y_Vision.Configuration;
 using Y_Vision.PipeLine;
 
@@ -27,7 +28,7 @@ namespace Y_Vision.DetectionAPI
                 {
                     _config = config;
                 }
-                _detector = new HumanDetectorPipeline(_config);
+                _detector = new HumanDetectorPipeline(_config) { BlobFactory = new BlobFactory() };
                 _detector.DetectionUpdate += DetectorOnDetectionUpdate;
             }
             catch (FileNotFoundException)
@@ -66,7 +67,7 @@ namespace Y_Vision.DetectionAPI
                 var result = DetectedPeople.Find(p => p.UniqueId == person.UniqueId);
                 if(result == null)
                 {
-                    var newPerson = new TrackedPerson(person);
+                    var newPerson = new TrackedPerson2D(person, _detector.DepthW, _detector.DepthH);
                     alreadyHandled.Add(newPerson);
                     DetectedPeople.Add(newPerson);
                     if (PersonEnter != null)

@@ -53,9 +53,10 @@
     <Compile Include="ConnectedComponentLabeling\DisjointSet.cs" />
     <Compile Include="Core\Point.cs" />
     <Compile Include="Core\Point3D.cs" />
+    <Compile Include="DetectionAPI\ParallaxTrackedPerson.cs" />
     <Compile Include="DetectionAPI\SingleSensor2DHumanDetector.cs" />
     <Compile Include="DetectionAPI\ParallaxHumanDetector.cs" />
-    <Compile Include="DetectionAPI\TrackedPerson.cs" />
+    <Compile Include="DetectionAPI\TrackedPerson2D.cs" />
     <Compile Include="GroundRemoval\CoordinateSystemConverter.cs" />
     <Compile Include="GroundRemoval\PlaneGroundRemover.cs" />
     <Compile Include="MicrosoftKinectHelpers\CallbackLock.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="SensorStreams\KinectSensorContext.cs" />
     <Compile Include="SensorStreams\SensorContext.cs" />
     <Compile Include="Tracking\BranchAndBound.cs" />
+    <Compile Include="Tracking\BranchAndBoundMatcher.cs" />
     <Compile Include="Tracking\BranchAndBoundTracker.cs" />
     <Compile Include="Tracking\TrackedObject.cs" />
     <Compile Include="Tracking\TrackableObject.cs" />

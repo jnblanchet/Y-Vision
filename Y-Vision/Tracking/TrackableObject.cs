@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Y_Vision.Core;
 
 namespace Y_Vision.Tracking
 {
@@ -37,5 +38,12 @@ namespace Y_Vision.Tracking
         public abstract int ComputeDistanceWith(TrackableObject other);
 
         public abstract TrackedObject ToTrackedObject();
+
+        public void ChangeCoordiateSystem(Point3D newPoint)
+        {
+            X = newPoint.X;
+            Y = newPoint.Y;
+            Z = newPoint.Z;
+        }
     }
 }

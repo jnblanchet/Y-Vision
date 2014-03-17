@@ -471,7 +471,6 @@ namespace Y_Vision.Triangulation
         // will throw a MissingFieldException if the input coordinates are insufficient to triangulate
         public override Point3D? GetNormalizedCoordinates(int idSensor)
         {
-            Point3D p;
             if (idSensor < 0 || idSensor >= NbSensors)
             {
                 if (ThrowExceptions)

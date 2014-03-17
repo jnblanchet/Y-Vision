@@ -11,6 +11,7 @@ namespace Y_Vision.Configuration
         private const int MaxSampleCount = 6;
         private readonly Dictionary<string, List<Point3D>> _parallaxPoint3DSets;
         private readonly Dictionary<string, List<Point>> _referencePoint2DSets;
+        public int LeftPadding, RightPadding, DisplayWidth, DisplayHeight, DisplayDistanceFromGround;
 
         public ParallaxConfig()
         {
