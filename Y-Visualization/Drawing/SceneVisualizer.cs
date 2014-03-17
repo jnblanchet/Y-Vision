@@ -8,14 +8,10 @@ namespace Y_Visualization.Drawing
     {
         private Bitmap _scene;
 
-        // Temporary pixel per PointUnit: TODO: REMOVE
+        // Temporary pixel per PointUnit: TODO: Find a better solution
         private double pxToMmRatio = 1.0d;
         int centerX = 0, centerY = 0;
         
-        public SceneVisualizer() {
-            
-        }
-
         public Bitmap DrawScene(int w, int h, Point positionSensor1, Point positionSensor2, double angle1, double angle2, double range, float FoV1, float FoV2, float userScaleFactor = 0.05f)
         {
             // Init
