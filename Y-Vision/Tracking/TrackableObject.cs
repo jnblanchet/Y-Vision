@@ -45,5 +45,11 @@ namespace Y_Vision.Tracking
             Y = newPoint.Y;
             Z = newPoint.Z;
         }
+
+        public override string ToString()
+        {
+            return String.Format("{0} at ({1};{2};{3}) and total surface = {4}",
+                GetType(),OnscreenX, OnscreenY, DistanceZ, Surface);
+        }
     }
 }

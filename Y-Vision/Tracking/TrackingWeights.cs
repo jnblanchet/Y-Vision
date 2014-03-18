@@ -13,20 +13,20 @@ namespace Y_Vision.Tracking
             if (t.GetType() == typeof(BlobObject))
                 return 10;
             if (t.GetType() == typeof(FlatBlobObject))
-                return 1;
+                return 10;// Should be 1 when using mm tracking
             if (t.GetType() == typeof(TrackedObject))
-                return 1;
+                return 10;// Should be 1 when using mm tracking
             throw new Exception("The new blob type is not associated with any weights!");
         }
 
         public static int GetWeightSurface(TrackableObject t)
         {
             if (t.GetType() == typeof(BlobObject))
-                return 2;
+                return 20;// Should be 2 when using mm tracking
             if (t.GetType() == typeof(FlatBlobObject))
                 return 20;
             if (t.GetType() == typeof(TrackedObject))
-                return 2;
+                return 20;// Should be 2 when using mm tracking
             throw new Exception("The new blob type is not associated with any weights!");
         }
     }

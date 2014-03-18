@@ -51,7 +51,7 @@ namespace Y_Vision.Tracking
             X += VelocityX;
             VelocityX *= 0.95;
 
-            //Y += VelocityY;
+            //Y += VelocityY; // Not used anymore, as it is unreliable
             //VelocityY *= 0.35;
 
             Z += VelocityZ;
@@ -60,9 +60,9 @@ namespace Y_Vision.Tracking
 
             // On screen for display
             OnscreenX += OnscreenVelocityX;
-            VelocityX *= 0.95;
+            OnscreenVelocityX *= 0.95;
             DistanceZ += OnscreenVelocityZ;
-            DistanceZ *= 0.75;
+            OnscreenVelocityZ *= 0.75;
             
             if(OnAttributesUpdate!= null)
                 OnAttributesUpdate.Invoke(this,new EventArgs());
@@ -103,15 +103,21 @@ namespace Y_Vision.Tracking
 
         public override int ComputeDistanceWith(TrackableObject other)
         {
-            return (int)Math.Pow(other.X - (X + VelocityX), 2)
-                   + (int)Math.Pow(other.Y - (Y + VelocityY), 2)
-                   + (int)Math.Pow((other.Z - (Z + VelocityZ)) / TrackingWeights.GetWeightZ(other), 2)
+            return (int)Math.Pow(other.OnscreenX - (OnscreenX + OnscreenVelocityX), 2)
+                   + (int)Math.Pow(other.OnscreenY - (OnscreenY), 2)
+                   + (int)Math.Pow((other.DistanceZ - (DistanceZ + OnscreenVelocityZ)) / TrackingWeights.GetWeightZ(other), 2)
                    + Math.Abs(Surface - other.Surface) / TrackingWeights.GetWeightSurface(other);
         }
 
         public override TrackedObject ToTrackedObject()
         {
             return this;
+        }
+
+        public override string ToString()
+        {
+            return String.Format("{0} at ({1};{2};{3}) and speed ({5};0;{6}) total surface = {4}",
+                GetType(), OnscreenX, OnscreenY, DistanceZ, Surface, OnscreenVelocityX, OnscreenVelocityZ);
         }
 
         public event EventHandler<EventArgs> OnAttributesUpdate;
