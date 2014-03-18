@@ -9,6 +9,7 @@ using Y_Vision.Core;
 using Y_Vision.GroundRemoval;
 using Y_Vision.SensorStreams;
 using Y_Vision.Tracking;
+using Y_Vision.Triangulation;
 
 namespace Y_Vision.PipeLine
 {
@@ -20,14 +21,26 @@ namespace Y_Vision.PipeLine
         // Pipeline
         private readonly KinectStreamMicrosoftApi _kinect;
         private readonly ConnectedComponentLabling _ccl;
+        private BlobFilter _blobFilter;
         private readonly BranchAndBoundTracker _tracker;
         private readonly PlaneGroundRemover _groundRemover;
+        private BlobFactory _blobFactory;
+        public BlobFactory BlobFactory
+        {
+           private get { return _blobFactory; }
+           set
+            {
+                _blobFactory = value;
+                _blobFilter = new BlobFilter(_blobFactory, _kinect.Context);
+            }
+        }
 
         // Pipieline Artifact
         public List<TrackedObject> DepthTrackedObjects { private set; get; }
-        public List<BlobObject> Blobs { private set; get; }
+        public List<TrackableObject> Blobs { private set; get; }
         public short[,] BlobIndex { private set; get; }
         public short[] RawDepth { private set; get; }
+        public short[,] Depth2D { private set; get; }
         public int DepthW { private set; get; }
         public int DepthH { private set; get; }
         public byte[] RawColor { private set; get; }
@@ -44,6 +57,10 @@ namespace Y_Vision.PipeLine
         public KinectSensorContext Context { get { return _kinect.Context;  } }
         public SensorConfig Config { private set; get; }
 
+        /// <summary>
+        /// Creates a pipeline that will use a sensor to trigger detection events
+        /// </summary>
+        /// <param name="config">The sensor configuration.</param>
         public HumanDetectorPipeline(SensorConfig config)
         {
             _sw = new Stopwatch();
@@ -54,10 +71,13 @@ namespace Y_Vision.PipeLine
             _groundRemover = new PlaneGroundRemover(_kinect.Context, config);
             Config = config;
         }
-
+        //_blobFactory = new BlobFactory(new CoordinateSystemConverter(_kinect.Context), _kinect.Context);
 
         public void Start()
         {
+            if(BlobFactory == null)
+                throw new ArgumentNullException("A blob factory must be specified before starting the detector.");
+
             // Multithread stream processing
             _depthProcessor = new BackgroundWorker();
             _colorProcessor = new BackgroundWorker();
@@ -98,16 +118,16 @@ namespace Y_Vision.PipeLine
             RawDepth = frames.DepthArray; DepthW = frames.DepthWidth; DepthH = frames.DepthHeight;
             RawColor = frames.ColorArray; ColorW = frames.ColorWidth; ColorH = frames.ColorHeight;
 
-            var depth2D = frames.DepthTo2DArray();
+            Depth2D = frames.DepthTo2DArray();
 
             //Remove ground
-            _groundRemover.ApplyMask(depth2D);
+            _groundRemover.ApplyMask(Depth2D);
 
             // Region segmentation
-            BlobIndex = _ccl.FindConnectedComponents(depth2D);
+            BlobIndex = _ccl.FindConnectedComponents(Depth2D);
 
             // Blob detection
-            Blobs = BlobFilter.ToBlobObjects(_ccl.BlobInfo, Context, DepthW, DepthH);
+            Blobs = _blobFilter.ToBlobObjects(_ccl.BlobInfo);
 
             // Blob tracking
             DepthTrackedObjects = _tracker.TrackObjects(Blobs);

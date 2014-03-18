@@ -13,13 +13,13 @@ namespace Y_Vision.Tracking
 
         protected List<TrackedObject> TrackedObjects;
 
-        protected Tracker(int maxDistance = 500)
+        protected Tracker(int maxDistance = 20000)
         {
             MaxDistance = maxDistance;
             TrackedObjects = new List<TrackedObject>();
         }
 
-        public List<TrackedObject> TrackObjects(IEnumerable<TrackableObject> newObjects)
+        public virtual List<TrackedObject> TrackObjects(IEnumerable<TrackableObject> newObjects)
         {
             // new Tracking frame: increment age of all old frames
             TrackedObjects.ForEach(o => o.PrepareForNewTrackingFrame());

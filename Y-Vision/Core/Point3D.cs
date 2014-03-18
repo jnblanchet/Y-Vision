@@ -29,5 +29,10 @@ namespace Y_Vision.Core
         {
             return new Point3D(c1.X * s, c1.Y * s, c1.Z * s);
         }
+
+        public static Point3D operator *(Point3D c1, double s)
+        {
+            return new Point3D(c1.X * s, c1.Y * s, c1.Z * s);
+        }
     }
 }

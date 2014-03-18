@@ -1,35 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Y_Vision.ConnectedComponentLabeling;
-using Y_Vision.GroundRemoval;
 using Y_Vision.SensorStreams;
+using Y_Vision.Tracking;
 
 namespace Y_Vision.BlobDescriptor
 {
-    public static class BlobFilter
+    internal class BlobFilter
     {
         private const float CloseToGroundThreshold = 0.65f;
         private const float MinScreenSurface = 0.05f;
 
-        public static List<BlobObject> ToBlobObjects(IEnumerable<ConnectedComponentLabling.Blob> blobs, KinectSensorContext context, int w, int h)
+        private readonly BlobFactory _factory;
+        private readonly KinectSensorContext _context;
+
+        internal BlobFilter(BlobFactory factory, KinectSensorContext context)
         {
-            int minsurface = (int) (w*h*MinScreenSurface);
-            int closeToGround = (int) (h*CloseToGroundThreshold);
-            var newBlobs = new List<BlobObject>();
+            _factory = factory;
+            _context = context;
+        }
+
+
+        public List<TrackableObject> ToBlobObjects(IEnumerable<ConnectedComponentLabling.Blob> blobs)
+        {
+            var minsurface = (int)(_context.DepthWidth * _context.DepthHeight * MinScreenSurface);
+            var closeToGround = (int) (_context.DepthHeight * CloseToGroundThreshold);
+            var newBlobs = new List<TrackableObject>();
+
             foreach(var b in blobs)
             {
                 if (b.Count > minsurface) // Large enough surface
                     if ((double)(b.MaxY - b.MinY) / (b.MaxX - b.MinX) > 2.0d) // Human like proportion
-                        if (FilterByHumanHeight(b.Y,b.MinY,b.MaxY,h,b.Z,context.VerticalFieldOfViewRad)) // Human height range
+                        if (FilterByHumanHeight(b.Y, b.MinY, b.MaxY, _context.DepthHeight, b.Z, _context.VerticalFieldOfViewRad)) // Human height range
                             if (b.MaxY > closeToGround) // Close enough from the ground approximation
-                                newBlobs.Add(new BlobObject(b));
+                                newBlobs.Add(_factory.CreateBlob(b));
             }
             return newBlobs;
         }
 
-        private static bool FilterByHumanHeight(int yCenter, int yMin, int yMax, int height, int distance, double verticalFoV)
+        private bool FilterByHumanHeight(int yCenter, int yMin, int yMax, int height, int distance, double verticalFoV)
         {
             const int minDistance = 1500;
             // Filter not applicable if the person is not completely visible

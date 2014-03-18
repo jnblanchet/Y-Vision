@@ -1,21 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Y_Vision.Tracking
 {
     public class TrackedObject : TrackableObject
     {
         public double VelocityX, VelocityY, VelocityZ;
+        public double OnscreenVelocityX, OnscreenVelocityZ;
         // In frame count
         public int Age { get; private set; }
         public int LastSeen { get; private set; }
         private static ulong _idGenerator = 0;
         public ulong UniqueId { get; private set; }
 
-        public TrackedObject(double x, double y, double z, int maxX, int minX, int maxY, int minY, int count)
+        public TrackedObject(double x, double y, double z, double onScreenX, double onScreenY, double distance, int maxX, int minX, int maxY, int minY, int count)
         {
+            OnscreenX = onScreenX;
+            OnscreenY = onScreenY;
+            DistanceZ = distance;
+
             X = x;
             Y = y;
             Z = z;
@@ -45,49 +47,79 @@ namespace Y_Vision.Tracking
 
         internal void UpdateUntrackedFrame()
         {
+            // Real coords
             X += VelocityX;
             VelocityX *= 0.95;
 
-            //Y += VelocityY;
+            //Y += VelocityY; // Not used anymore, as it is unreliable
             //VelocityY *= 0.35;
 
             Z += VelocityZ;
             VelocityZ *= 0.75;
+
+
+            // On screen for display
+            OnscreenX += OnscreenVelocityX;
+            OnscreenVelocityX *= 0.95;
+            DistanceZ += OnscreenVelocityZ;
+            OnscreenVelocityZ *= 0.75;
+            
+            if(OnAttributesUpdate!= null)
+                OnAttributesUpdate.Invoke(this,new EventArgs());
         }
 
-        internal void UpdateTrackedFrame(TrackableObject obj)
+        // For blobs and detection
+        public void UpdateTrackedFrame(TrackableObject other)
         {
             Age++;
             LastSeen = 0;
 
-            VelocityX = VelocityX * 0.3 + (obj.X - X) * 0.7;
-            VelocityY = VelocityY * 0.5 + (obj.Y - Y) * 0.5;
-            VelocityZ = VelocityZ * 0.3 + (obj.Z - Z) * 0.7;
+            OnscreenVelocityX = OnscreenVelocityX * 0.5 + (other.OnscreenX - OnscreenX) * 0.5;
+            OnscreenVelocityZ = OnscreenVelocityZ * 0.5 + (other.DistanceZ - DistanceZ) * 0.5;
 
-            X = (X * 0.5 + obj.X * 0.5);
-            Y = (Y * 0.5 + obj.Y * 0.5);
-            Z = (Z * 0.5 + obj.Z * 0.5);
+            VelocityX = VelocityX * 0.5 + (other.X - X) * 0.5;
+            VelocityY = VelocityY * 0.5 + (other.Y - Y) * 0.5;
+            VelocityZ = VelocityZ * 0.5 + (other.Z - Z) * 0.5;
 
-            MaxX = (int) (MaxX * 0.5 + obj.MaxX * 0.5);
-            MinX = (int)(MinX * 0.5 + obj.MinX * 0.5);
-            MaxY = (int) (MaxY * 0.5 + obj.MaxY * 0.5);
-            MinY = (int)(MinY * 0.5 + obj.MinY * 0.5);
+            // For display mostly
+            OnscreenX = (int) (OnscreenX * 0.5 + other.OnscreenX * 0.5);
+            OnscreenY = (int) (OnscreenY * 0.5 + other.OnscreenY * 0.5);
+            DistanceZ = (int) (DistanceZ * 0.5 + other.DistanceZ * 0.5);
 
-            Surface = (int)(Surface * 0.7 + obj.Surface * 0.3);
+            X = (X * 0.5 + other.X * 0.5);
+            Y = (Y * 0.5 + other.Y * 0.5);
+            Z = (Z * 0.5 + other.Z * 0.5);
+
+            MaxX = (int) (MaxX * 0.5 + other.MaxX * 0.5);
+            MinX = (int)(MinX * 0.5 + other.MinX * 0.5);
+            MaxY = (int) (MaxY * 0.5 + other.MaxY * 0.5);
+            MinY = (int)(MinY * 0.5 + other.MinY * 0.5);
+
+            Surface = (int)(Surface * 0.5 + other.Surface * 0.5);
+
+            if (OnAttributesUpdate != null)
+                OnAttributesUpdate.Invoke(this, new EventArgs());
         }
 
         public override int ComputeDistanceWith(TrackableObject other)
         {
-            // random divisions for weights TODO: FIX WEIGTHS
-            return (int)Math.Pow(other.X - (X + VelocityX), 2)
-                   + (int)Math.Pow(other.Y - (Y + VelocityY), 2)
-                   + (int)Math.Pow((other.Z - (Z + VelocityZ)) / 10, 2)
-                   + Math.Abs(Surface - other.Surface) / 20;
+            return (int)Math.Pow(other.OnscreenX - (OnscreenX + OnscreenVelocityX), 2)
+                   + (int)Math.Pow(other.OnscreenY - (OnscreenY), 2)
+                   + (int)Math.Pow((other.DistanceZ - (DistanceZ + OnscreenVelocityZ)) / TrackingWeights.GetWeightZ(other), 2)
+                   + Math.Abs(Surface - other.Surface) / TrackingWeights.GetWeightSurface(other);
         }
 
         public override TrackedObject ToTrackedObject()
         {
             return this;
         }
+
+        public override string ToString()
+        {
+            return String.Format("{0} at ({1};{2};{3}) and speed ({5};0;{6}) total surface = {4}",
+                GetType(), OnscreenX, OnscreenY, DistanceZ, Surface, OnscreenVelocityX, OnscreenVelocityZ);
+        }
+
+        public event EventHandler<EventArgs> OnAttributesUpdate;
     }
 }

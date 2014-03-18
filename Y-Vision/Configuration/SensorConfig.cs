@@ -39,7 +39,7 @@ namespace Y_Vision.Configuration
         }
 
         // This method does not really add a point, it only triggers the event. The Point should be added to the list by the handler.
-        // This is required since there are required operations before the point can be added. (e.g. must be converted to another axis system).
+        // This is needed since there are required operations before the point can be added. (e.g. must be converted to another axis system).
         public void AddGroundPoint(Point3D p)
         {
             if (GroundPointsChanged != null)
