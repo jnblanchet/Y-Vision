@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Y_Vision.Core;
+using Y_Vision.GroundRemoval;
+using System.Linq;
 
 namespace Y_Vision.Configuration
 {
@@ -10,6 +12,7 @@ namespace Y_Vision.Configuration
         private const int MaxSampleCount = 6;
         private readonly Dictionary<string, List<Point3D>> _parallaxPoint3DSets;
         private readonly Dictionary<string, List<Point>> _referencePoint2DSets;
+        public int LeftPadding, RightPadding, DisplayWidth, DisplayHeight, DisplayDistanceFromGround;
 
         public ParallaxConfig()
         {
@@ -94,6 +97,40 @@ namespace Y_Vision.Configuration
                 }
             }
             return s;
+        }
+
+        public void ClearAll()
+        {
+            _parallaxPoint3DSets.Clear();
+            _referencePoint2DSets.Clear();
+        }
+
+        public void SmoothAllPoints(string key, short[,] depth, int weightCurrent, int weightNew, CoordinateSystemConverter conv)
+        {
+            int h = depth.GetLength(0);
+            int w = depth.GetLength(1);
+
+            int iterations = Math.Min(_parallaxPoint3DSets[key].Count, _referencePoint2DSets[key].Count);
+
+            var p2D = _referencePoint2DSets[key];
+            var p3D = _parallaxPoint3DSets[key];
+
+            for (int i = 0; i < iterations; i++)
+            {
+                var Z = depth[(int) p2D[i].Y, (int) p2D[i].X];
+                if(Z >0)
+                {
+                    var newPoint = conv.ToXyz(p2D[i].X, p2D[i].Y, Z, h, w);
+                    p3D[i] = new Point3D((p3D[i].X*weightCurrent + newPoint.X*weightNew)/(weightCurrent + weightNew),
+                                         (p3D[i].Y*weightCurrent + newPoint.Y*weightNew)/(weightCurrent + weightNew),
+                                         (p3D[i].Z*weightCurrent + newPoint.Z*weightNew)/(weightCurrent + weightNew));
+                }
+            }
+        }
+
+        public string[] GetSensorId()
+        {
+            return _parallaxPoint3DSets.Keys.ToArray();
         }
     }
 }

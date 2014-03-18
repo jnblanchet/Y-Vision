@@ -87,7 +87,9 @@
       <Name>Y-Visualization</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\setup.png" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="Resources\grayscale.png" />
   </ItemGroup>

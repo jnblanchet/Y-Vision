@@ -4,7 +4,9 @@ using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.Kinect.Toolkit;
+using Y_Vision.BlobDescriptor;
 using Y_Vision.Configuration;
+using Y_Vision.Core;
 using Y_Vision.GroundRemoval;
 using Y_Vision.PipeLine;
 using Y_Vision.SensorStreams;
@@ -73,6 +75,8 @@ namespace Y_CalibrationBoard
                 GroundThresholdTextBox.Enabled = true;
 
                 _detector = new HumanDetectorPipeline(_currentConfig);
+                _detector.BlobFactory = new BlobFactory { Context = _detector.Context, Conv = new CoordinateSystemConverter(_detector.Context) };
+
                 _detector.DetectionUpdate += (o, args) =>
                                                  {
                                                      toolStripFpsLabel.Text = String.Format("{0} FPS", _detector.Fps);
@@ -197,7 +201,8 @@ namespace Y_CalibrationBoard
         /// to build the config, and to draw the scene in the 3d tab
         /// </summary>
         private void InitCalibrationTab()
-        {            
+        {
+            userSceneScale.SelectedIndex = 0;
             var sensorList = KinectStreamMicrosoftApi.SensorIdList.Select(p => (object)p.ConnectionId).ToArray();
             comboBoxCalibrationLeft.Items.AddRange(sensorList);
             comboBoxCalibrationRight.Items.AddRange(sensorList);
@@ -218,6 +223,8 @@ namespace Y_CalibrationBoard
                                                        }
                                                        DrawScene();
                                                    };
+
+            LoadNumericparams();
         }
 
         /// <summary>
@@ -249,11 +256,18 @@ namespace Y_CalibrationBoard
                     _parallaxLeft.Stop();
                 var conf = _configs.GetConfigById(comboBoxCalibrationLeft.Text);
                 _parallaxLeft = new HumanDetectorPipeline(conf);
+                _parallaxLeft.BlobFactory = new BlobFactory { Context = _parallaxLeft.Context, Conv = new CoordinateSystemConverter(_parallaxLeft.Context) };
                 _parallaxLeft.DetectionUpdate += (o, args) =>
                         {
                             _parallaxLeftBmp.CreateBitmapFromDepthFrame(_parallaxLeft.RawDepth,_parallaxLeft.DepthH,_parallaxLeft.DepthW);
                             _parallaxLeftBmp.DrawPointsWithUniqueColor(_parallaxLeftBmp.DepthBitamp, _configs.ParallaxConfig.Get2DPoints(conf.SensorId));
                             ParallaxContainer.DisplayFrames(_parallaxLeftBmp.DepthBitamp, null);
+                            if(_averageModeLeft > 0)
+                            {
+                                _configs.ParallaxConfig.SmoothAllPoints(conf.SensorId, _parallaxLeft.Depth2D, FrameCountAverageMode - _averageModeLeft, 1, _convL);
+                                _averageModeLeft--;
+                            }
+                                
                         };
                 _convL = new CoordinateSystemConverter(_parallaxLeft.Context);
                 _parallaxLeft.Start();
@@ -264,12 +278,20 @@ namespace Y_CalibrationBoard
                     _parallaxRight.Stop();
                 var conf = _configs.GetConfigById(comboBoxCalibrationRight.Text);
                 _parallaxRight = new HumanDetectorPipeline(conf);
+                _parallaxRight.BlobFactory = new BlobFactory { Context = _parallaxRight.Context, Conv = new CoordinateSystemConverter(_parallaxRight.Context) };
                 _parallaxRight.DetectionUpdate += (o, args) =>
                         {
                             _parallaxRightBmp.CreateBitmapFromDepthFrame(_parallaxRight.RawDepth,_parallaxRight.DepthH,_parallaxRight.DepthW);
                             _parallaxRightBmp.DrawPointsWithUniqueColor(_parallaxRightBmp.DepthBitamp, _configs.ParallaxConfig.Get2DPoints(conf.SensorId));
                             ParallaxContainer.DisplayFrames(null, _parallaxRightBmp.DepthBitamp);
                             DrawTrackedPeople();
+                            if (_averageModeRight > 0)
+                            {
+                                _configs.ParallaxConfig.SmoothAllPoints(conf.SensorId, _parallaxRight.Depth2D, FrameCountAverageMode - _averageModeRight, 1, _convR);
+                                _averageModeRight--;
+                                if (_averageModeRight == 0)
+                                    DrawScene();
+                            }
                         };
                 _convR = new CoordinateSystemConverter(_parallaxLeft.Context);
                 _parallaxRight.Start();
@@ -307,47 +329,32 @@ namespace Y_CalibrationBoard
                 tool.AddTriangulationPoint(1, p.X, p.Y, p.Z);
 
             //TODO: add try catch for invalid points
-
-            // Retrieve the angle for drawing
-            tool.GetSensorAngle(0);
-            tool.GetSensorAngle(1);
-
-            _baseBitmap = _sceneDrawer.DrawScene(SetupPictureBox.Width, SetupPictureBox.Height,
-                                                new Point((int) tool.GetSensorPosX(0), (int) -tool.GetSensorPosZ(0)),
-                                                new Point((int) tool.GetSensorPosX(1), (int) -tool.GetSensorPosZ(1)),
-                                                -90 - _parallaxLeft.Context.HorizontalFieldOfViewDeg / 2 + tool.GetSensorAngle(0),
-                                                -90 - _parallaxRight.Context.HorizontalFieldOfViewDeg / 2 + tool.GetSensorAngle(1),
-                                                4095,
-                                                (float) _parallaxLeft.Context.HorizontalFieldOfViewDeg,
-                                                (float) _parallaxRight.Context.HorizontalFieldOfViewDeg);
-
-            _mappingTool = new MappingTool(tool);
-
-            DrawTrackedPeople();
-            /*var conf1 = _configs.GetConfigById(comboBoxCalibrationLeft.Text);
-            var conf2 = _configs.GetConfigById(comboBoxCalibrationRight.Text);
-            var p1 = conf1.ReferencePoint;
-            var p2 = conf2.ReferencePoint;
-
-            if ((p1.X > 0 || p1.Y > 0) && (p2.X > 0 || p2.Y > 0))
+            try
             {
+                // Retrieve the angle for drawing
+                tool.GetSensorAngle(0);
+                tool.GetSensorAngle(1);
 
-                var convL = new CoordinateSystemConverter(_parallaxLeft.Context);
-                var convR = new CoordinateSystemConverter(_parallaxRight.Context);
+                _baseBitmap = _sceneDrawer.DrawScene(SetupPictureBox.Width, SetupPictureBox.Height,
+                                                    new Point((int) tool.GetSensorPosX(0), (int) -tool.GetSensorPosZ(0)),
+                                                    new Point((int) tool.GetSensorPosX(1), (int) -tool.GetSensorPosZ(1)),
+                                                    -90 - _parallaxLeft.Context.HorizontalFieldOfViewDeg / 2 + tool.GetSensorAngle(0),
+                                                    -90 - _parallaxRight.Context.HorizontalFieldOfViewDeg / 2 + tool.GetSensorAngle(1),
+                                                    4095,
+                                                    (float) _parallaxLeft.Context.HorizontalFieldOfViewDeg,
+                                                    (float) _parallaxRight.Context.HorizontalFieldOfViewDeg,
+                                                    (float)(1 / Math.Pow(2,int.Parse(userSceneScale.Text)-1)));
 
-                var pointNorm1 = convL.ToXyz(p1.X, p1.Y, p1.Z, _parallaxLeftBmp.DepthBitamp.Width,
-                                             _parallaxLeftBmp.DepthBitamp.Height);
-                var pointNorm2 = convR.ToXyz(p2.X, p2.Y, p2.Z, _parallaxRightBmp.DepthBitamp.Width,
-                                             _parallaxRightBmp.DepthBitamp.Height);
+                _mappingTool = new MappingTool(tool);
 
-                pointNorm1 *= -1;
-                pointNorm2 *= -1;
-
-                SetupPictureBox.Image = _sceneDrawer.drawScene(SetupPictureBox.Width, SetupPictureBox.Height,
-                                                               new Point((int) pointNorm1.X, (int) pointNorm1.Z),
-                                                               new Point((int)pointNorm2.X, (int)pointNorm2.Z), (int) conf1.ReferencePoint2D.X, (int) conf2.ReferencePoint2D.X,
-                                                               4095);
-            }*/
+                DrawTrackedPeople();
+            }
+            catch (Exception x)
+            {
+                StopAverage();
+                MessageBox.Show("The selected points are considered bad, try again with better points.", "Bad Points", MessageBoxButtons.OK);
+                _configs.ParallaxConfig.ClearAll();
+            }
         }
 
         private void DrawTrackedPeople()
@@ -360,7 +367,8 @@ namespace Y_CalibrationBoard
                 // Draw Left sensor tracked objects
                 foreach (var obj in _parallaxLeft.DepthTrackedObjects)
                 {
-                    var p = _convL.ToXyz(obj.X, obj.Y, obj.Z, _parallaxLeftBmp.DepthBitamp.Width, _parallaxLeftBmp.DepthBitamp.Height);
+                    //var p = _convL.ToXyz(obj.X, obj.Y, obj.Z, _parallaxLeftBmp.DepthBitamp.Width, _parallaxLeftBmp.DepthBitamp.Height);
+                    var p = new Point3D(obj.X, obj.Y, obj.Z);
                     var normalizedP = _mappingTool.GetNormalizedCoordinates(0,p);
                     if (normalizedP.HasValue)
                     {
@@ -385,7 +393,8 @@ namespace Y_CalibrationBoard
                 // Draw Right sensor tracked objects
                 foreach (var obj in _parallaxRight.DepthTrackedObjects)
                 {
-                    var p = _convR.ToXyz(obj.X, obj.Y, obj.Z, _parallaxRightBmp.DepthBitamp.Width, _parallaxRightBmp.DepthBitamp.Height);
+                    //var p = _convR.ToXyz(obj.X, obj.Y, obj.Z, _parallaxRightBmp.DepthBitamp.Width, _parallaxRightBmp.DepthBitamp.Height);
+                    var p = new Point3D(obj.X,obj.Y,obj.Z);
                     var normalizedP = _mappingTool.GetNormalizedCoordinates(1, p);
                     if (normalizedP.HasValue)
                     {
@@ -412,5 +421,49 @@ namespace Y_CalibrationBoard
             }
         }
         #endregion
+
+        private void UserSceneScaleSelectedIndexChanged(object sender, EventArgs e)
+        {
+            DrawScene();
+        }
+
+        private int _averageModeLeft, _averageModeRight;
+        private const int FrameCountAverageMode = 30;
+        private void AverageButtonClick(object sender, EventArgs e)
+        {
+            _averageModeLeft = FrameCountAverageMode;
+            _averageModeRight = FrameCountAverageMode;
+        }
+        private void StopAverage()
+        {
+            _averageModeLeft = 0;
+            _averageModeRight = 0;
+        }
+
+        private void PrintPointsButtonClick(object sender, EventArgs e)
+        {
+            MessageBox.Show(_configs.ParallaxConfig.ToString(), "Parallax configuration", MessageBoxButtons.OK);
+        }
+
+        private void NumericUpDownValueChanged(object sender, EventArgs e)
+        {
+            switch (((NumericUpDown)sender).Name.Last())
+            {
+                case 'A': _configs.ParallaxConfig.LeftPadding = (int)numericUpDownA.Value; break;
+                case 'B': _configs.ParallaxConfig.DisplayWidth = (int) numericUpDownB.Value; break;
+                case 'C': _configs.ParallaxConfig.RightPadding = (int) numericUpDownC.Value; break;
+                case 'D': _configs.ParallaxConfig.DisplayHeight = (int) numericUpDownD.Value; break;
+                case 'E': _configs.ParallaxConfig.DisplayDistanceFromGround = (int) numericUpDownE.Value; break;
+            }
+        }
+
+        private void LoadNumericparams()
+        {
+            numericUpDownA.Value = _configs.ParallaxConfig.LeftPadding;
+            numericUpDownB.Value = _configs.ParallaxConfig.DisplayWidth;
+            numericUpDownC.Value = _configs.ParallaxConfig.RightPadding;
+            numericUpDownD.Value = _configs.ParallaxConfig.DisplayHeight;
+            numericUpDownE.Value = _configs.ParallaxConfig.DisplayDistanceFromGround;
+        }
     }
 }

@@ -30,6 +30,7 @@ namespace Y_Vision.Tracking
                 {
                     // Valid match: update tracking!
                     TrackedObjects.ElementAt(matches[i]).UpdateTrackedFrame(newObjs[i]);
+                    //Console.WriteLine("Object Tracked with a distance of " + TrackedObjects.ElementAt(matches[i]).ComputeDistanceWith(newObjs[i]));
                 }
             }
         }
@@ -37,14 +38,16 @@ namespace Y_Vision.Tracking
         private int[,] GenratedScores(TrackableObject[] newObjects)
         {
             var scores = new int[newObjects.Count(), TrackedObjects.Count];
-
+            int c = 0;
             for (int j = 0; j < newObjects.Length; j++)
             {
                 for (int i = 0; i < TrackedObjects.Count; i++)
                 {
                     scores[j, i] = TrackedObjects.ElementAt(i).ComputeDistanceWith(newObjects.ElementAt(j));
+                    //Console.WriteLine(c++ + " - Computed Distance=" + scores[j, i] + " objects are (" + TrackedObjects.ElementAt(i).ToString() + " ; " + newObjects.ElementAt(j) + ")");
                 }
             }
+            //Console.WriteLine("--- Total Objects tracked that frame = " + TrackedObjects.Count);
             return scores;
         }
     }

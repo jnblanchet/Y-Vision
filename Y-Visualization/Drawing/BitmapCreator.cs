@@ -161,7 +161,7 @@ namespace Y_Visualization.Drawing
                 var pen = new Pen(Brushes.GreenYellow, 4);
                 foreach (var p in trackedObjects)
                 {
-                    var rect = new Rectangle((int)(p.X - (p.Width >> 1)), (int)(p.Y - (p.Height >> 1)), p.Width, p.Height);
+                    var rect = new Rectangle((int)(p.OnscreenX - (p.Width >> 1)), (int) (p.OnscreenY - (p.Height >> 1)), p.Width, p.Height);
                     rect.Width = (int)(rect.Width * scaleFactor);
                     rect.Height = (int)(rect.Height * scaleFactor);
                     rect.X = (int)(rect.X * scaleFactor);
@@ -172,14 +172,14 @@ namespace Y_Visualization.Drawing
             }
         }
 
-        public void DrawTrackedPeople(Bitmap bmp, IEnumerable<BlobObject> blobs, double scaleFactor = 1)
+        public void DrawTrackedPeople(Bitmap bmp, IEnumerable<TrackableObject> blobs, double scaleFactor = 1)
         {
             if (bmp != null && blobs != null)
             {
                 Graphics g = Graphics.FromImage(bmp);
 
                 var pen = new Pen(Brushes.Red, (int)(4 * scaleFactor));
-                var pen2 = new Pen(Brushes.DarkRed, (int)(4 * scaleFactor));
+                //var pen2 = new Pen(Brushes.DarkRed, (int)(4 * scaleFactor));
                 foreach (var p in blobs)
                 {
                     var rect = new Rectangle(p.MinX, p.MinY, p.Width, p.Height);
@@ -188,7 +188,14 @@ namespace Y_Visualization.Drawing
                     rect.X = (int) (rect.X*scaleFactor);
                     rect.Y = (int) (rect.Y*scaleFactor);
                     g.DrawRectangle(pen, rect);
-                    g.DrawRectangle(pen2, new Rectangle((int)((p.X - 2) * scaleFactor), (int)((p.Y - 2) * scaleFactor), (int) (4 * scaleFactor), (int) (4 * scaleFactor)));
+                    /*
+                        g.DrawString("X:" + p.X, new Font("Arial", 20), Brushes.Red, (float)p.OnscreenX, (float)p.OnscreenY);
+                        g.DrawString("Y:" + p.Y, new Font("Arial", 20), Brushes.Red, (float)p.OnscreenX, (float)p.OnscreenY+20);
+                        g.DrawString("Z:" + p.Z, new Font("Arial", 20), Brushes.Red, (float)p.OnscreenX, (float)p.OnscreenY+40);
+                    */
+
+                    // Center is not the same depending the the method that is used
+                    //g.DrawRectangle(pen2, new Rectangle((int)((p.X - 2) * scaleFactor), (int)((p.Y - 2) * scaleFactor), (int) (4 * scaleFactor), (int) (4 * scaleFactor)));
                 }
                 g.Flush();
             }
