@@ -1,11 +1,17 @@
 ﻿namespace Y_Visualization
 {
-    public static class ArrayWriter
+    public class ArrayWriter
     {
         private static bool _once = false;
+        private static bool _onlyWriteOnce = false;
+
+        public ArrayWriter(bool onlyWriteOnce = false)
+        {
+            _onlyWriteOnce = onlyWriteOnce;
+        }
         public static void ToTextFile(short[,] array, int h, int w)
         {
-            if(!_once)
+            if(!_onlyWriteOnce || !_once)
             {
                 _once = true;
                 var outStrings = new string[h];
@@ -18,14 +24,14 @@
                     }
                     outStrings[j] = outStrings[j].Substring(0, outStrings[j].Length - 1);
                 }
-                System.IO.File.WriteAllLines(@"C:\Users\Propriétaire\Desktop\testMatlab\TestCsOut.txt", outStrings);
+                System.IO.File.WriteAllLines(@"~\", outStrings);
             }
 
         }
 
         public static void ToTextFile(short[] array, int h, int w)
         {
-            if (!_once)
+            if (!_onlyWriteOnce || !_once)
             {
                 _once = true;
                 var outStrings = new string[h];
@@ -38,7 +44,7 @@
                     }
                     outStrings[j] = outStrings[j].Substring(0, outStrings[j].Length - 1);
                 }
-                System.IO.File.WriteAllLines(@"C:\Users\Propriétaire\Desktop\testMatlab\TestCsOut.txt", outStrings);
+                System.IO.File.WriteAllLines(@"~\", outStrings);
             }
 
         }
