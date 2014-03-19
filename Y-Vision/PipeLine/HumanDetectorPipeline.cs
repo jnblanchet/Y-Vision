@@ -35,6 +35,8 @@ namespace Y_Vision.PipeLine
             }
         }
 
+        private HoGManager _hoGManager;
+
         // Pipieline Artifact
         public List<TrackedObject> DepthTrackedObjects { private set; get; }
         public List<TrackableObject> Blobs { private set; get; }
@@ -70,6 +72,8 @@ namespace Y_Vision.PipeLine
             _kinect = new KinectStreamMicrosoftApi(config);
             _groundRemover = new PlaneGroundRemover(_kinect.Context, config);
             Config = config;
+
+            _hoGManager = new HoGManager();
         }
         //_blobFactory = new BlobFactory(new CoordinateSystemConverter(_kinect.Context), _kinect.Context);
 
@@ -105,7 +109,8 @@ namespace Y_Vision.PipeLine
 
         private void ColorProcessorOnDoWork(object sender, DoWorkEventArgs doWorkEventArgs)
         {
-            //var frames = (FramesReadyEventArgs) doWorkEventArgs.Argument;
+            var frames = (FramesReadyEventArgs) doWorkEventArgs.Argument;
+            //_hoGManager.ComputeCells(frames.ColorArray, frames.ColorWidth, frames.ColorHeight); // TODO: use this (after proxy optimization)
         }
 
         private void DepthProcessorOnDoWork(object sender, DoWorkEventArgs doWorkEventArgs)
