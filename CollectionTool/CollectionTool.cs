@@ -102,7 +102,12 @@ namespace CollectionTool
                 res = _depthHoGManager.GetHistogram(obj.MinX, obj.MinY, obj.MaxX, obj.MaxY);
                 var depthBins = res.Aggregate("", (agg, next) => next.ToString("r") + "," + agg); // r for "round-trip", meaning the output can be used as an input
                 depthBins = depthBins.Substring(0, depthBins.Length - 1);
-                _writer.WriteLine(id + "," + obj.Width + "," + obj.Height + "," + obj.DistanceZ + "," + obj.Surface + "," + rgbBins + "," + depthBins);
+
+                //Compute object height
+                var height = GetBlobHeight((int)obj.OnscreenY, obj.MinY, obj.MaxY, (int)obj.DistanceZ);
+                var width = GetBlobWidth((int)obj.OnscreenX, obj.MinX, obj.MaxX, (int)obj.DistanceZ);
+
+                _writer.WriteLine(id + "," + width + "," + height + "," + obj.DistanceZ + "," + obj.Surface + "," + rgbBins + "," + depthBins);
                 id++;
 
                 //write debug
@@ -133,6 +138,22 @@ namespace CollectionTool
         private void MainFormFormClosing(object sender, FormClosingEventArgs e)
         {
             _detector.Stop();
+        }
+
+        // TODO: do this better
+        private double GetBlobHeight(int yCenter, int yMin, int yMax, int distance, double verticalRadFoV = 1)
+        {
+            var personHeight = Math.Tan(((double)(yCenter - yMin) / 320) * verticalRadFoV) * distance
+                + Math.Tan(((double)(yMax - yCenter) / 320) * verticalRadFoV) * distance;
+
+            return personHeight;
+        }
+        private double GetBlobWidth(int xCenter, int xMin, int xMax, int distance, double HorizontalRadFoV = 0.75)
+        {
+            var personWidth = Math.Tan(((double)(xCenter - xMin) / 240) * HorizontalRadFoV) * distance
+                + Math.Tan(((double)(xMax - xCenter) / 240) * HorizontalRadFoV) * distance;
+
+            return personWidth;
         }
     }
 }
