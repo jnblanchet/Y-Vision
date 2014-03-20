@@ -47,19 +47,19 @@ namespace Y_Vision.BlobDescriptor
                                                 for (int i = 0; i < cellArrayW; i++)
                                                 {
                                                     _cells[j, i].Reinit();
+                                                    int dx = 0; double dy = 0;
                                                     for (int y = y0; y < y1; y++)
                                                         for (int x = x0; x < x1; x++)
                                                         {
-                                                            double dx = GetPixelAt(rgbImage, x + 1, y, w) -
-                                                                        GetPixelAt(rgbImage, x - 1, y, w);
-                                                            double dy = GetPixelAt(rgbImage, x, y + 1, w) -
-                                                                        GetPixelAt(rgbImage, x, y - 1, w);
-
-                                                            double mag = Math.Sqrt(dx*dx + dy*dy);
-                                                            double orien = Math.Atan(dy/dx);
-                                                            _cells[j, i].AddSample(mag, orien);
+                                                            dx += GetPixelAt(rgbImage, x + 1, y, w) - GetPixelAt(rgbImage, x - 1, y, w);
+                                                            dy += GetPixelAt(rgbImage, x, y + 1, w) -GetPixelAt(rgbImage, x, y - 1, w);
                                                         }
-                                                    _cells[j, i].FinalizeCell();
+                                                    double mag = Math.Sqrt(dx * dx + dy * dy);
+                                                    double orien = dx != 0 ? Math.Atan(dy / dx) : Min;
+                                                    _cells[j, i].SetCell(mag, orien);
+                                                    //Console.WriteLine("before - " + _cells[j, i].ToString());
+                                                    //_cells[j, i].FinalizeCell();
+                                                    
                                                     x0 += PixelsPerCell;
                                                     x1 += PixelsPerCell;
                                                 }
@@ -87,7 +87,7 @@ namespace Y_Vision.BlobDescriptor
 
                         }
                     }
-                    _cells[j, i].Magnitude = (neighborMag + _cells[j, i].Magnitude)/(sampleCount+1); // average between neighborhood average magnitude and local magnitude
+                    _cells[j, i].SmoothedMag = (neighborMag + _cells[j, i].Magnitude) / (sampleCount + 1); // average between neighborhood average magnitude and local magnitude
                 }
             }
         }
@@ -103,38 +103,45 @@ namespace Y_Vision.BlobDescriptor
         private static readonly double Max = Math.PI/2;
         private static readonly double Step = (Max - Min) / BinCount;
         private static readonly float[] BinThresholds = new[]{ // contains the threshold (angles from -Pi to Pi) for the bins
-                                                            -1,570796327f,
-                                                            -1,221730476f,
-                                                            -0,872664626f,
-                                                            -0,523598776f,
-                                                            -0,174532925f,
-                                                            0,174532925f,
-                                                            0,523598776f,
-                                                            0,872664626f,
-                                                            1,221730476};
+                                                            -1.570796327f,
+                                                            -1.221730476f,
+                                                            -0.872664626f,
+                                                            -0.523598776f,
+                                                            -0.174532925f,
+                                                            0.174532925f,
+                                                            0.523598776f,
+                                                            0.872664626f,
+                                                            1.221730476f};
 
         public float[] GetHistogram(int x0, int y0, int x1, int y1)
         {
             var histogram = new float[BinCount];
 
-            const int roundPadding = PixelsPerCell/2;
+            //const int roundPadding = PixelsPerCell/2;
 
-            int i0 = (x0 + roundPadding)/PixelsPerCell;
-            int i1 = (x1 + roundPadding)/PixelsPerCell;
-            int j0 = (y0 + roundPadding)/PixelsPerCell;
-            int j1 = (y1 + roundPadding)/PixelsPerCell;
+            int cellArrayW = _cells.GetLength(1)-1;
+            int cellArrayH = _cells.GetLength(0)-1;
 
+            int i0 = Math.Max((x0 - PixelsPerCell) / PixelsPerCell, 0);
+            int i1 = Math.Min((x1 + PixelsPerCell) / PixelsPerCell, cellArrayW);
+            int j0 = Math.Max((y0 - PixelsPerCell) / PixelsPerCell, 0);
+            int j1 = Math.Min((y1 + PixelsPerCell) / PixelsPerCell, cellArrayH);
+
+            // Compute histogram by checking every cell
             for (int j = j0; j <= j1; j++)
             {
                 for (int i = i0; i <= i1; i++)
                 {
                     int lowerBinIndex = (int)((_cells[j, i].Orientation - Min)/Step);
-                    histogram[lowerBinIndex] += (float)(_cells[j, i].Magnitude * Math.Abs(_cells[j, i].Orientation - BinThresholds[lowerBinIndex]) / Step);
-                    histogram[lowerBinIndex+1] += (float)(_cells[j, i].Magnitude * Math.Abs(_cells[j, i].Orientation - BinThresholds[lowerBinIndex+1]) / Step);
+                    double distanceLowerBin = Math.Abs(_cells[j, i].Orientation - BinThresholds[lowerBinIndex]) / Step;
+                    histogram[lowerBinIndex] += (float)(_cells[j, i].SmoothedMag * (1 - distanceLowerBin));
+                    histogram[lowerBinIndex + 1 == BinCount ? 0 : lowerBinIndex + 1] += (float)(_cells[j, i].SmoothedMag * distanceLowerBin);
                 }
             }
 
-            return histogram;
+            // Normalize histogram
+            double total = histogram.Sum();
+            return histogram.Select(v => (float)(v / total)).ToArray();
         }
 
         // TODO: speed up atan with an approximation (also unit test the method?)
@@ -169,31 +176,37 @@ namespace Y_Vision.BlobDescriptor
         private struct Cell
         {
             public double Magnitude;
+            public double SmoothedMag;
             public double Orientation;
-            public double Count;
+            //public double Count;
             
-            public void AddSample(double mag, double orien)
+            public void SetCell(double mag, double orien)
             {
-                Magnitude += mag;
-                Orientation += orien;
-                Count++;
+                Magnitude = mag;
+                Orientation = orien;
+                //Count++;
             }
 
-            public void FinalizeCell()
+            /*public void FinalizeCell()
             {
                 if (Count > 0)
                 {
+                    Orientation /= Math.Max(Magnitude,1); // weighted average
                     Magnitude /= Count;
-                    Orientation /= Count;
                     Count = 0;
                 }
-            }
+            }*/
 
             public void Reinit()
             {
                 Magnitude = 0;
                 Orientation = 0;
-                Count = 0;
+                SmoothedMag = 0;
+            }
+
+            public override string ToString()
+            {
+                return "Cell: Magnitude = " + Magnitude + ", Orientation = " + Orientation + ", SmoothedMag = " + SmoothedMag;
             }
         }
 
