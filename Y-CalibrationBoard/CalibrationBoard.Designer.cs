@@ -34,7 +34,7 @@
             this.setupRgbdViewer = new Y_Visualization.Drawing.RgbdViewer();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.cbSensorId = new System.Windows.Forms.ToolStripComboBox();
-            this.toolStripFpsLabel = new System.Windows.Forms.ToolStripLabel();
+            this.MsLabel = new System.Windows.Forms.ToolStripLabel();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.savetoolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -77,6 +77,7 @@
             this.numericUpDownA = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
             this.distanceSetupPictureBox = new System.Windows.Forms.PictureBox();
+            this.FpsLabel = new System.Windows.Forms.ToolStripLabel();
             this.tabControl.SuspendLayout();
             this.SensorSetupTab.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -136,7 +137,8 @@
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.cbSensorId,
-            this.toolStripFpsLabel,
+            this.FpsLabel,
+            this.MsLabel,
             this.toolStripSeparator1,
             this.savetoolStripButton,
             this.toolStripSeparator2,
@@ -162,11 +164,11 @@
             this.cbSensorId.Size = new System.Drawing.Size(221, 25);
             this.cbSensorId.SelectedIndexChanged += new System.EventHandler(this.CbSensorIdSelectedIndexChanged);
             // 
-            // toolStripFpsLabel
+            // MsLabel
             // 
-            this.toolStripFpsLabel.Name = "toolStripFpsLabel";
-            this.toolStripFpsLabel.Size = new System.Drawing.Size(35, 22);
-            this.toolStripFpsLabel.Text = "0 FPS";
+            this.MsLabel.Name = "MsLabel";
+            this.MsLabel.Size = new System.Drawing.Size(32, 22);
+            this.MsLabel.Text = "0 ms";
             // 
             // toolStripSeparator1
             // 
@@ -596,6 +598,12 @@
             this.distanceSetupPictureBox.TabIndex = 0;
             this.distanceSetupPictureBox.TabStop = false;
             // 
+            // FpsLabel
+            // 
+            this.FpsLabel.Name = "FpsLabel";
+            this.FpsLabel.Size = new System.Drawing.Size(35, 22);
+            this.FpsLabel.Text = "0 FPS";
+            // 
             // CalibrationBoard
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -644,7 +652,7 @@
         private System.Windows.Forms.ToolStripButton rotatetoolStripButton;
         private System.Windows.Forms.TabPage VisionBoardTab;
         private Y_Visualization.Drawing.RgbdViewer setupRgbdViewer;
-        private System.Windows.Forms.ToolStripLabel toolStripFpsLabel;
+        private System.Windows.Forms.ToolStripLabel MsLabel;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripButton savetoolStripButton;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
@@ -684,6 +692,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.NumericUpDown numericUpDownA;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ToolStripLabel FpsLabel;
     }
 }
 

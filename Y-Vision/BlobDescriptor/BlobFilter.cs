@@ -30,7 +30,7 @@ namespace Y_Vision.BlobDescriptor
             foreach(var b in blobs)
             {
                 if (b.Count > minsurface) // Large enough surface
-                    if ((double)(b.MaxY - b.MinY) / (b.MaxX - b.MinX) > 2.0d) // Human like proportion
+                    if ((double)(b.MaxY - b.MinY) / (b.MaxX - b.MinX) > 1.2d) // Human like proportion
                         if (FilterByHumanHeight(b.Y, b.MinY, b.MaxY, _context.DepthHeight, b.Z, _context.VerticalFieldOfViewRad)) // Human height range
                             if (b.MaxY > closeToGround) // Close enough from the ground approximation
                                 newBlobs.Add(_factory.CreateBlob(b));

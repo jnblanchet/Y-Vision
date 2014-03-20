@@ -61,5 +61,9 @@ namespace Y_Vision.Configuration
             }
         }
 
+        public string[] GetSensorId()
+        {
+            return SensorConfigurations.Select(c => c.SensorId).ToArray();
+        }
     }
 }

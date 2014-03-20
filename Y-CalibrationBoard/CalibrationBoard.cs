@@ -63,6 +63,7 @@ namespace Y_CalibrationBoard
             cbSensorId.Items.AddRange(_sensors.Select(p => (object)p.ConnectionId).ToArray());
         }
 
+        private double _smoothedProcessingTime = 0;
         private void CbSensorIdSelectedIndexChanged(object sender, EventArgs e)
         {
             if (cbSensorId.SelectedIndex != -1)
@@ -79,7 +80,9 @@ namespace Y_CalibrationBoard
 
                 _detector.DetectionUpdate += (o, args) =>
                                                  {
-                                                     toolStripFpsLabel.Text = String.Format("{0} FPS", _detector.Fps);
+                                                     FpsLabel.Text = String.Format("{0} FPS", _detector.Fps);
+                                                     _smoothedProcessingTime = (_smoothedProcessingTime*5 + _detector.LastProcessTime)/6;
+                                                     MsLabel.Text = String.Format("{0} ms", (int)_smoothedProcessingTime);
                                                      // Generate bitmaps and display!
                                                      switch (_depthMode)
                                                      {

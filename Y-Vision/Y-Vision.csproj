@@ -45,6 +45,7 @@
     <Compile Include="BlobDescriptor\BlobObject.cs" />
     <Compile Include="BlobDescriptor\BlobFactory.cs" />
     <Compile Include="BlobDescriptor\FlatBlobObject.cs" />
+    <Compile Include="BlobDescriptor\HoGManager.cs" />
     <Compile Include="Configuration\ConfigurationManager.cs" />
     <Compile Include="Configuration\ParallaxConfig.cs" />
     <Compile Include="Configuration\SensorConfig.cs" />
