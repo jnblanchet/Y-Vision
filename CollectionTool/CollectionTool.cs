@@ -80,11 +80,13 @@ namespace CollectionTool
             _hoGManager.ComputeCells(_detector.RawColor, _detector.ColorW, _detector.ColorH);
             foreach(var obj in snapshot)
             {
-                var cropArea = new Rectangle((int)(obj.MinX * depthToRgbRatio), (int)(obj.MinY * depthToRgbRatio), (int)((obj.MaxX - obj.MinX) * depthToRgbRatio), (int)((obj.MaxY - obj.MinY) * depthToRgbRatio));
+                // 6 px padding
+                var cropArea = new Rectangle((int)(obj.MinX * depthToRgbRatio - 6), (int)(obj.MinY * depthToRgbRatio - 6), (int)((obj.MaxX - obj.MinX + 6) * depthToRgbRatio), (int)((obj.MaxY - obj.MinY + 6) * depthToRgbRatio));
                 bmpCrop = _bmpCreator.ColorBitamp.Clone(cropArea, _bmpCreator.ColorBitamp.PixelFormat);
                 bmpCrop.Save(_path + "\\" + id + ".bmp");
                 var res = _hoGManager.GetHistogram(cropArea.Left, cropArea.Top, cropArea.Right, cropArea.Bottom);
-                var bins = res.Aggregate("", (agg, next) => next + "," + agg);
+                var bins = res.Aggregate("", (agg, next) => next.ToString("r") + "," + agg); // r for "round-trip", meaning the output can be used as an input
+                bins = bins.Substring(0, bins.Length - 1);
                 _writer.WriteLine(id + "," + obj.Width + "," + obj.Height + "," + obj.DistanceZ + "," + obj.Surface + "," + bins);
                 id++;
             }
