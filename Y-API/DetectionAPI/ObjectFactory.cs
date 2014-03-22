@@ -6,15 +6,15 @@ using Y_API.DetectionAPI.MessageObjects;
 
 namespace Y_API.DetectionAPI
 {
-    class ObjectFactory
+    static class ObjectFactory
     {
         public const string ClassDelim = ":";
-        private readonly Builder[] _builders = new Builder[] { new PersonBuilder(), new EmptyFrameBuilder(),  };
+        private static readonly Builder[] _builders = new Builder[] { new PersonBuilder(), new EmptyFrameBuilder(),  };
 
         /// <summary>
         /// Returns the newly created object or throws an exception if invalid
         /// </summary>
-        public IStringEncodable CreateObject(String code)
+        public static IStringEncodable CreateObject(String code)
         {
             // Get encoded class id
             int typeHeader = code.IndexOf(ClassDelim);
@@ -31,7 +31,7 @@ namespace Y_API.DetectionAPI
             return _builders.First(b => b.ClassId == classId).Build(endCode);
         }
 
-        public string AppendHeader(Type type, string body)
+        public static string AppendHeader(Type type, string body)
         {
             return _builders.First(b => b.BuildingType.IsAssignableFrom(type)).AppendHeader(body);
         }
