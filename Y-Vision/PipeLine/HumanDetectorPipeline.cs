@@ -170,8 +170,8 @@ namespace Y_Vision.PipeLine
         /// </summary>
         public Point3D? RatioPointInRange(double x, double y)
         {
-            var sensorXCoords = (int) (x * DepthW + 0.5);
-            var sensorYCoords = (int) (y * DepthH + 0.5);
+            var sensorXCoords = (int) (x * DepthW + 0.5 - 1);
+            var sensorYCoords = (int) (y * DepthH + 0.5 - 1);
 
             var value = RawDepth[sensorYCoords * DepthW + sensorXCoords];
             if (value > KinectSensorContext.MinDepthValue && value <= KinectSensorContext.MaxDepthValue)
