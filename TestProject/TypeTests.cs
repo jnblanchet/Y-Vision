@@ -7,12 +7,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace YUnitTests
 {
     [TestClass]
-    public class type
+    public class TypeTests
     {
         [TestMethod]
-        public void TestMethod1()
+        public void TestMethod()
         {
-            Assert.AreEqual((int)-1.4d,-2);
+            Assert.AreEqual((int)-1.4d,-1);
         }
     }
 }
