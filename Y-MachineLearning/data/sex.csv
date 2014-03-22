@@ -1,0 +1,13 @@
+Sex,ID,Height,Weight,FootSize
+male,0,6,180,12
+male,1,5.92,190,11
+male,2,5.58,170,12
+male,3,5.92,165,10
+female,4,5,100,6
+female,5,5.5,150,8
+female,6,5.42,130,7
+female,7,5.75,150,9
+transgender,8,4,200,5
+transgender,9,4.10,150,8
+transgender,10,5.42,190,7
+transgender,11,5.50,150,9
