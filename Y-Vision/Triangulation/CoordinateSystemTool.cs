@@ -21,10 +21,10 @@ namespace Y_Vision.Triangulation
 
         public Point3D? GetNormalizedCoordinates(int idSensor, double x, double y, double z)
         {
-            double angle = Math.PI * SensorsAngle[idSensor] / 180.0;
+            double angle = Math.PI * SensorsAngle[idSensor] / 180.0;    
 
             /*newX = Math.Cos(angle) * x - Math.Sin(angle) * z + sensorX * (1 - Math.Cos(angle)) + sensorZ * Math.Sin(angle);
-        newZ = Math.Sin(angle) * x + Math.Cos(angle) * z - sensorX * Math.Sin(angle) + sensorZ * (1 - Math.Cos(angle));*/
+            newZ = Math.Sin(angle) * x + Math.Cos(angle) * z - sensorX * Math.Sin(angle) + sensorZ * (1 - Math.Cos(angle));*/
 
             double newX = Math.Cos(angle) * x - Math.Sin(angle) * z + GetSensorPosX(idSensor);
             double newZ = Math.Sin(angle) * x + Math.Cos(angle) * z + GetSensorPosZ(idSensor);

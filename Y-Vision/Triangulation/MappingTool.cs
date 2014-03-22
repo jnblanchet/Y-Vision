@@ -16,15 +16,15 @@ namespace Y_Vision.Triangulation
 
             for (int i = 0; i < tool.NbSensors; i++)
             {
-                SensorsPos[i].X = tool.SensorsPos[i].X;
-                SensorsPos[i].Y = tool.SensorsPos[i].Y;
-                SensorsPos[i].Z = tool.SensorsPos[i].Z;
-                SensorsAngle[i] = tool.SensorsAngle[i];
+                SensorsPos[i].X = tool.GetSensorPosX(i);
+                SensorsPos[i].Y = tool.GetSensorPosY(i);
+                SensorsPos[i].Z = tool.GetSensorPosZ(i);
+                SensorsAngle[i] = tool.GetSensorAngle(i);
             }
         }
 
         private double _a, _b, _c, _mod, _mmToDisplayRatio, _displayRatio; // cached constants
-        public void InitializeProjection(int leftPadding, int rightPadding, int displayWidth, int displayHeight, int displayDistanceFromGround)
+        public void InitializeProjection(int leftPadding, int displayWidth, int rightPadding, int displayHeight, int displayDistanceFromGround)
         {
             _leftPadding = leftPadding;
             _rightPadding = rightPadding;

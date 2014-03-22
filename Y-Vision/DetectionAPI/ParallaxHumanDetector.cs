@@ -88,7 +88,11 @@ namespace Y_Vision.DetectionAPI
                 return;
 
             var firstResults = _firstDetector.DepthTrackedObjects;
-            var secondResults = _firstDetector.DepthTrackedObjects;
+            var secondResults = _secondDetector.DepthTrackedObjects;
+
+            if (firstResults == null || secondResults == null)
+                return;
+
             var combinedObjects = _matcher.GenerateMatches(firstResults, secondResults);
 
             var trackedCombinedObject = _tracker.TrackObjects(combinedObjects);
