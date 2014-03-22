@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Y-Emulator", "Y-Emulator\Y-
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CollectionTool", "CollectionTool\CollectionTool.csproj", "{29C09E29-007C-4100-8FA7-619244DC6A74}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Y-MachineLearning", "Y-MachineLearning\Y-MachineLearning.csproj", "{A94DA5B1-2C8D-47BE-BB00-B83F7B78D370}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Y-Vision.vsmdi
@@ -144,6 +146,16 @@ Global
 		{29C09E29-007C-4100-8FA7-619244DC6A74}.Release|Mixed Platforms.Build.0 = Release|x86
 		{29C09E29-007C-4100-8FA7-619244DC6A74}.Release|x86.ActiveCfg = Release|x86
 		{29C09E29-007C-4100-8FA7-619244DC6A74}.Release|x86.Build.0 = Release|x86
+		{A94DA5B1-2C8D-47BE-BB00-B83F7B78D370}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{A94DA5B1-2C8D-47BE-BB00-B83F7B78D370}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{A94DA5B1-2C8D-47BE-BB00-B83F7B78D370}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{A94DA5B1-2C8D-47BE-BB00-B83F7B78D370}.Debug|x86.ActiveCfg = Debug|x86
+		{A94DA5B1-2C8D-47BE-BB00-B83F7B78D370}.Debug|x86.Build.0 = Debug|x86
+		{A94DA5B1-2C8D-47BE-BB00-B83F7B78D370}.Release|Any CPU.ActiveCfg = Release|x86
+		{A94DA5B1-2C8D-47BE-BB00-B83F7B78D370}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{A94DA5B1-2C8D-47BE-BB00-B83F7B78D370}.Release|Mixed Platforms.Build.0 = Release|x86
+		{A94DA5B1-2C8D-47BE-BB00-B83F7B78D370}.Release|x86.ActiveCfg = Release|x86
+		{A94DA5B1-2C8D-47BE-BB00-B83F7B78D370}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
