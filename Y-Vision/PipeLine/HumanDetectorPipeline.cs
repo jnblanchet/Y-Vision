@@ -65,9 +65,10 @@ namespace Y_Vision.PipeLine
         /// <param name="config">The sensor configuration.</param>
         public HumanDetectorPipeline(SensorConfig config)
         {
+            const int maxTrackingDistancePixelSystem = 20000;
             _sw = new Stopwatch();
             _ccl = new ConnectedComponentLabling();
-            _tracker = new BranchAndBoundTracker();
+            _tracker = new BranchAndBoundTracker(maxTrackingDistancePixelSystem);
 
             _kinect = new KinectStreamMicrosoftApi(config);
             _groundRemover = new PlaneGroundRemover(_kinect.Context, config);
@@ -170,8 +171,8 @@ namespace Y_Vision.PipeLine
         /// </summary>
         public Point3D? RatioPointInRange(double x, double y)
         {
-            var sensorXCoords = (int) (x * DepthW + 0.5);
-            var sensorYCoords = (int) (y * DepthH + 0.5);
+            var sensorXCoords = (int) (x * DepthW + 0.5 - 1);
+            var sensorYCoords = (int) (y * DepthH + 0.5 - 1);
 
             var value = RawDepth[sensorYCoords * DepthW + sensorXCoords];
             if (value > KinectSensorContext.MinDepthValue && value <= KinectSensorContext.MaxDepthValue)

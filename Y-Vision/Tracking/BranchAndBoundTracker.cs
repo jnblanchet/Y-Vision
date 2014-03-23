@@ -8,7 +8,7 @@ namespace Y_Vision.Tracking
     {
         private readonly BranchAndBound _bnb;
 
-        public BranchAndBoundTracker(): base() //TODO: maxdistance threshold here
+        public BranchAndBoundTracker(int maxDistance): base(maxDistance) //TODO: maxdistance threshold here
         {
             _bnb = new BranchAndBound(MaxDistance);
         }
@@ -38,7 +38,7 @@ namespace Y_Vision.Tracking
         private int[,] GenratedScores(TrackableObject[] newObjects)
         {
             var scores = new int[newObjects.Count(), TrackedObjects.Count];
-            int c = 0;
+            //int c = 0;
             for (int j = 0; j < newObjects.Length; j++)
             {
                 for (int i = 0; i < TrackedObjects.Count; i++)
@@ -47,7 +47,7 @@ namespace Y_Vision.Tracking
                     //Console.WriteLine(c++ + " - Computed Distance=" + scores[j, i] + " objects are (" + TrackedObjects.ElementAt(i).ToString() + " ; " + newObjects.ElementAt(j) + ")");
                 }
             }
-            //Console.WriteLine("--- Total Objects tracked that frame = " + TrackedObjects.Count);
+                //Console.WriteLine("--- Total Objects tracked that frame = " + TrackedObjects.Count + " new objects count = " + newObjects.Count());
             return scores;
         }
     }

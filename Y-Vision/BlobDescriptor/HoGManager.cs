@@ -151,8 +151,9 @@ namespace Y_Vision.BlobDescriptor
                                                                 1.221730476f
                                                             };
 
-        public float[] GetHistogram(int x0, int y0, int x1, int y1)
+        public float[] GetHistogram(int x0, int y0, int x1, int y1, out double totalMagnitude)
         {
+            totalMagnitude = 0;
             var histogram = new float[BinCount];
 
             //const int roundPadding = PixelsPerCell/2;
@@ -180,6 +181,7 @@ namespace Y_Vision.BlobDescriptor
 
             // Normalize histogram
             double total = histogram.Sum();
+            totalMagnitude = total;
             return histogram.Select(v => (float) (v/total)).ToArray();
         }
 

@@ -15,7 +15,7 @@ namespace Y_Vision.BlobDescriptor
     {
         public BlobObject(ConnectedComponentLabling.Blob blob, CoordinateSystemConverter conv, int h, int w) : base(blob)
         {
-            var realCoords = conv.ToXyz(blob.X, blob.Y, blob.Z + 100, h, w);
+            var realCoords = conv.ToXyz(blob.X, blob.Y, blob.Z, h, w);
             X = realCoords.X;
             Y = realCoords.Y;
             Z = realCoords.Z;

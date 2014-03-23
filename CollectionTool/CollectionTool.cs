@@ -37,7 +37,7 @@ namespace CollectionTool
             _path = Directory.CreateDirectory(DateTime.Now.ToString("yyyy-MM-dd hh_mm_ss")).FullName;
             _writer = File.AppendText(_path + "\\blobs.txt");
             _writer.AutoFlush = true;
-            _writer.WriteLine("sampleId,Width,Height,Distance,Surface" + Enumerable.Range(1, HoGManager.BinCount).Aggregate("", (agg, next) => agg + ",RgbBin" + next) + Enumerable.Range(1, HoGManager.BinCount).Aggregate("", (agg, next) => agg + ",DepthBin" + next));
+            _writer.WriteLine("SampleId,PxWidth,PxHeight,MmWidth,MmHeight,Distance,Surface,TotalMagnitudeRGB,TotalMagnitudeDepth" + Enumerable.Range(1, HoGManager.BinCount).Aggregate("", (agg, next) => agg + ",RgbBin" + next) + Enumerable.Range(1, HoGManager.BinCount).Aggregate("", (agg, next) => agg + ",DepthBin" + next));
 
             // Load config (and print error if config not found)
             var configManager = new ConfigurationManager();
@@ -95,11 +95,13 @@ namespace CollectionTool
                 bmpCrop = _bmpCreator.ColorBitamp.Clone(cropArea, _bmpCreator.ColorBitamp.PixelFormat);
                 bmpCrop.Save(_path + "\\" + id + ".bmp");
                 // Compute RGB HOG
-                var res = _colorHoGManager.GetHistogram(hogArea.Left, hogArea.Top, hogArea.Right, hogArea.Bottom);
+                double magRgb;
+                var res = _colorHoGManager.GetHistogram(hogArea.Left, hogArea.Top, hogArea.Right, hogArea.Bottom, out magRgb);
                 var rgbBins = res.Aggregate("", (agg, next) => next.ToString("r") + "," + agg); // r for "round-trip", meaning the output can be used as an input
                 rgbBins = rgbBins.Substring(0, rgbBins.Length - 1);
                 // Compute Depth HOG
-                res = _depthHoGManager.GetHistogram(obj.MinX, obj.MinY, obj.MaxX, obj.MaxY);
+                double magDepth;
+                res = _depthHoGManager.GetHistogram(obj.MinX, obj.MinY, obj.MaxX, obj.MaxY, out magDepth);
                 var depthBins = res.Aggregate("", (agg, next) => next.ToString("r") + "," + agg); // r for "round-trip", meaning the output can be used as an input
                 depthBins = depthBins.Substring(0, depthBins.Length - 1);
 
@@ -107,7 +109,7 @@ namespace CollectionTool
                 var height = GetBlobHeight((int)obj.OnscreenY, obj.MinY, obj.MaxY, (int)obj.DistanceZ);
                 var width = GetBlobWidth((int)obj.OnscreenX, obj.MinX, obj.MaxX, (int)obj.DistanceZ);
 
-                _writer.WriteLine(id + "," + width + "," + height + "," + obj.DistanceZ + "," + obj.Surface + "," + rgbBins + "," + depthBins);
+                _writer.WriteLine(id + "," + obj.Width + "," + obj.Height + "," + width + "," + height + "," + obj.DistanceZ + "," + obj.Surface + "," + magRgb + "," + magDepth + "," + rgbBins + "," + depthBins);
                 id++;
 
                 //write debug

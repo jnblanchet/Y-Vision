@@ -41,7 +41,7 @@ namespace Y_Vision.DetectionAPI
                 {
                     firstSensor = _manager.ParallaxConfig.GetSensorId()[0];
                     secondSensor = _manager.ParallaxConfig.GetSensorId()[1];
-                }catch(Exception e)
+                }catch(Exception)
                 {
                     throw new NullReferenceException("No valid config file was found!");
                 }
@@ -72,10 +72,12 @@ namespace Y_Vision.DetectionAPI
             _secondDetector = new HumanDetectorPipeline(_secondConfig);
             _secondDetector.BlobFactory = new BlobFactory { Context = _secondDetector.Context, Conv = new CoordinateSystemConverter(_secondDetector.Context), MappingTool = _mappingTool, SensorId = 1 };
 
-            _matcher = new BranchAndBoundMatcher();
-            _tracker = new BranchAndBoundTracker();
+            //const int maxTrackingDistancePixelSystem = 100000; // For now, the human tracking pipeline system still uses pixels for tracking as it is more precise
+            const int maxTrackingDistanceMmSystem = 1000000; // Roughly equivalent to 1m
 
-            // TODO: Map events to a banch and bound pipeline or a tracker or something so the items can be merged
+            _matcher = new BranchAndBoundMatcher(maxTrackingDistanceMmSystem);
+            _tracker = new BranchAndBoundTracker(maxTrackingDistanceMmSystem);
+
             _firstDetector.DetectionUpdate += (sender, args) => { _frameReadyFirst = true; DetectorOnDetectionUpdate(); };
             _secondDetector.DetectionUpdate += (sender, args) => { _frameReadySecond = true; DetectorOnDetectionUpdate(); };
 
@@ -88,7 +90,11 @@ namespace Y_Vision.DetectionAPI
                 return;
 
             var firstResults = _firstDetector.DepthTrackedObjects;
-            var secondResults = _firstDetector.DepthTrackedObjects;
+            var secondResults = _secondDetector.DepthTrackedObjects;
+
+            if (firstResults == null || secondResults == null)
+                return;
+
             var combinedObjects = _matcher.GenerateMatches(firstResults, secondResults);
 
             var trackedCombinedObject = _tracker.TrackObjects(combinedObjects);

@@ -36,20 +36,15 @@ namespace Y_Visualization.Drawing
             pxToMmRatio = scale;
 
             var redPen = new Pen(Brushes.Chartreuse, 2);
-            var drawnCoords1 = new Point(center.X + (int)(positionSensor1.X * -scale), center.Y + (int)(positionSensor1.Y * scale));
+            var drawnCoords1 = new Point(center.X + (int)(positionSensor1.X * scale), center.Y + (int)(positionSensor1.Y * scale));
             g.DrawRectangle(redPen, drawnCoords1.X - 10, drawnCoords1.Y - 10, 20, 20);
 
             var orangePen = new Pen(Brushes.DodgerBlue, 2);
-            var drawnCoords2 = new Point(center.X + (int)(positionSensor2.X * -scale), center.Y + (int)(positionSensor2.Y * scale));
+            var drawnCoords2 = new Point(center.X + (int)(positionSensor2.X * scale), center.Y + (int)(positionSensor2.Y * scale));
             g.DrawRectangle(orangePen, drawnCoords2.X - 10, drawnCoords2.Y - 10, 20, 20);
 
             
             //Draw field of view
-            //Compute start angle
-            //var alpha1 = (float)(Math.Atan2((center.Y - drawnCoords1.Y),(center.X - drawnCoords1.X)) * 180.0d / Math.PI - ((double)offSetLeft1 / 320 * 57.0d));
-            //var alpha2 = (float)(Math.Atan2((center.Y - drawnCoords2.Y),(center.X - drawnCoords2.X)) * 180.0d / Math.PI - ((double)offSetLeft2 / 320 * 57.0d));
-
-
             g.DrawPie(redPen, (float)(drawnCoords1.X - range * scale), (float)(drawnCoords1.Y - range * scale), (float)(range * scale * 2), (float)(range * scale * 2), (float)(angle1), FoV1);
             g.DrawPie(orangePen, (float)(drawnCoords2.X - range * scale), (float)(drawnCoords2.Y - range * scale), (float)(range * scale * 2), (float)(range * scale * 2), (float)(angle2), FoV2);
 
@@ -60,7 +55,8 @@ namespace Y_Visualization.Drawing
 
         public Point ConvertToLastKnownScale(Point pos)
         {
-            return new Point(centerX + (int)(pos.X * -pxToMmRatio), centerY + (int)(pos.Y * pxToMmRatio));
+            // -1 on X to revert the mirror effect from the sensor
+            return new Point(centerX + (int)(pos.X * pxToMmRatio), centerY + (int)(pos.Y * pxToMmRatio));
         }
     }
 }

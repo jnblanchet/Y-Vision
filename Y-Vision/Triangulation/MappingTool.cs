@@ -16,15 +16,15 @@ namespace Y_Vision.Triangulation
 
             for (int i = 0; i < tool.NbSensors; i++)
             {
-                SensorsPos[i].X = tool.SensorsPos[i].X;
-                SensorsPos[i].Y = tool.SensorsPos[i].Y;
-                SensorsPos[i].Z = tool.SensorsPos[i].Z;
-                SensorsAngle[i] = tool.SensorsAngle[i];
+                SensorsPos[i].X = tool.GetSensorPosX(i);
+                SensorsPos[i].Y = tool.GetSensorPosY(i);
+                SensorsPos[i].Z = tool.GetSensorPosZ(i);
+                SensorsAngle[i] = tool.GetSensorAngle(i);
             }
         }
 
-        private double _a, _b, _c, _mod, _mmToDisplayRatio, _displayRatio; // cached constants
-        public void InitializeProjection(int leftPadding, int rightPadding, int displayWidth, int displayHeight, int displayDistanceFromGround)
+        private double _a, _b, _c, _mod, _detectedSensorDistance, _displayWidthOccupationRatio, _projectionPaddingWidthRatio; // cached constants
+        public void InitializeProjection(int leftPadding, int displayWidth, int rightPadding, int displayHeight, int displayDistanceFromGround)
         {
             _leftPadding = leftPadding;
             _rightPadding = rightPadding;
@@ -42,9 +42,12 @@ namespace Y_Vision.Triangulation
             _c = (-z2 + z1) * x1 + z1 * (x2 - x1);
             _mod = _a*_a + _b*_b;
 
-            _mmToDisplayRatio = (_displayWidth + _leftPadding + _rightPadding) / Math.Sqrt(_a * _a + _b * _b);
+            _detectedSensorDistance = Math.Sqrt(_mod);
 
-            _displayRatio = (double) _displayWidth/_displayHeight;
+            var totalScreenWidth = _leftPadding + _displayWidth + _rightPadding;
+            _displayWidthOccupationRatio = (double)_displayWidth / totalScreenWidth;
+            _projectionPaddingWidthRatio = (double)_leftPadding / totalScreenWidth;
+
         }
 
         public override double GetSensorPosX(int idSensor)
@@ -166,14 +169,17 @@ namespace Y_Vision.Triangulation
         /// <returns> a point in the new screen projection </returns>
         public Point3D ProjectPointOnDisplay(Point3D point)
         {
+            // Display Plane (line) is ax + bz + c = 0... source:http://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
             double projX = (_b * (_b * point.X - _a * point.Z) - _a * _c) / (_mod);
             double projZ = (_a * (-_b * point.X + _a * point.Z) - _b * _c) / (_mod);
+            double distance = Math.Abs(_a*point.X + _b*point.Z + _c)/_detectedSensorDistance;
 
-            double alpha = Math.Atan2(projZ, projX);
-            double offSetX = Math.Cos(alpha) * _leftPadding;
-            double offSetZ = Math.Sin(alpha) * _leftPadding;
-            
-            return new Point3D(projX + offSetX, (point.Y-_displayDistanceFromGround)*(_displayRatio), projZ + offSetZ) * _mmToDisplayRatio;
+            double distanceToOrigin = Math.Sqrt(projX*projX + projZ*projZ);
+
+            return new Point3D(
+                distanceToOrigin / _detectedSensorDistance * _displayWidthOccupationRatio + _projectionPaddingWidthRatio,
+                (point.Y / _displayHeight),
+                distance / _detectedSensorDistance);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Y_Vision.Tracking
 
         protected List<TrackedObject> TrackedObjects;
 
-        protected Tracker(int maxDistance = 20000)
+        protected Tracker(int maxDistance)
         {
             MaxDistance = maxDistance;
             TrackedObjects = new List<TrackedObject>();
