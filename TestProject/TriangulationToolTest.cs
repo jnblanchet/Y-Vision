@@ -27,7 +27,7 @@ namespace YUnitTests
                 tt.AddTriangulationPoint(1, 261.0d, 126.0d, 2451.0d);
                 double test = tt.GetSensorPosX(0);
             }
-            catch (Exception x)
+            catch (Exception)
             {
                 exception = true;
             }
