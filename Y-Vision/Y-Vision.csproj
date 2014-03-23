@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BlobDescriptor\BlobFilter.cs" />
-    <Compile Include="BlobDescriptor\BlobObject.cs" />
+    <Compile Include="BlobDescriptor\BlobObject3D.cs" />
     <Compile Include="BlobDescriptor\BlobFactory.cs" />
     <Compile Include="BlobDescriptor\FlatBlobObject.cs" />
     <Compile Include="BlobDescriptor\HoGManager.cs" />

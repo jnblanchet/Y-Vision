@@ -65,9 +65,10 @@ namespace Y_Vision.PipeLine
         /// <param name="config">The sensor configuration.</param>
         public HumanDetectorPipeline(SensorConfig config)
         {
+            const int maxTrackingDistancePixelSystem = 20000;
             _sw = new Stopwatch();
             _ccl = new ConnectedComponentLabling();
-            _tracker = new BranchAndBoundTracker();
+            _tracker = new BranchAndBoundTracker(maxTrackingDistancePixelSystem);
 
             _kinect = new KinectStreamMicrosoftApi(config);
             _groundRemover = new PlaneGroundRemover(_kinect.Context, config);

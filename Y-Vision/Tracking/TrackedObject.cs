@@ -71,7 +71,6 @@ namespace Y_Vision.Tracking
         // For blobs and detection
         public void UpdateTrackedFrame(TrackableObject other)
         {
-            Age++;
             LastSeen = 0;
 
             OnscreenVelocityX = OnscreenVelocityX * 0.5 + (other.OnscreenX - OnscreenX) * 0.5;
@@ -103,21 +102,21 @@ namespace Y_Vision.Tracking
 
         public override int ComputeDistanceWith(TrackableObject other)
         {
-            return (int)Math.Pow(other.OnscreenX - (OnscreenX + OnscreenVelocityX), 2)
-                   + (int)Math.Pow(other.OnscreenY - (OnscreenY), 2)
-                   + (int)Math.Pow((other.DistanceZ - (DistanceZ + OnscreenVelocityZ)) / TrackingWeights.GetWeightZ(other), 2)
+            return (int)Math.Pow(other.X - (X + VelocityX), 2)
+                   + (int)Math.Pow(other.Y - (Y), 2)
+                   + (int)Math.Pow((other.Z - (Z + VelocityZ)) / TrackingWeights.GetWeightZ(other), 2)
                    + Math.Abs(Surface - other.Surface) / TrackingWeights.GetWeightSurface(other);
         }
 
         public override TrackedObject ToTrackedObject()
         {
-            return this;
+            return new TrackedObject(X, Y, Z, OnscreenX, OnscreenY, DistanceZ, MaxX, MinX, MaxY, MinY, Surface);
         }
 
         public override string ToString()
         {
-            return String.Format("{0} at ({1};{2};{3}) and speed ({5};0;{6}) total surface = {4}",
-                GetType(), OnscreenX, OnscreenY, DistanceZ, Surface, OnscreenVelocityX, OnscreenVelocityZ);
+            return String.Format("{0} at ({1};{2};{3}) and speed ({5};0;{6}) total surface = {4}, age={7}, lastSeen={8}",
+                GetType(), OnscreenX, OnscreenY, DistanceZ, Surface, OnscreenVelocityX, OnscreenVelocityZ, Age, LastSeen);
         }
 
         public event EventHandler<EventArgs> OnAttributesUpdate;
