@@ -342,7 +342,7 @@ namespace Y_CalibrationBoard
                                                     new Point((int) tool.GetSensorPosX(0), (int) -tool.GetSensorPosZ(0)),
                                                     new Point((int) tool.GetSensorPosX(1), (int) -tool.GetSensorPosZ(1)),
                                                     -90 - _parallaxLeft.Context.HorizontalFieldOfViewDeg / 2 + tool.GetSensorAngle(0),
-                                                    -90 - _parallaxRight.Context.HorizontalFieldOfViewDeg / 2 + tool.GetSensorAngle(1),
+                                                    -90 - _parallaxRight.Context.HorizontalFieldOfViewDeg / 2 - tool.GetSensorAngle(1),
                                                     4095,
                                                     (float) _parallaxLeft.Context.HorizontalFieldOfViewDeg,
                                                     (float) _parallaxRight.Context.HorizontalFieldOfViewDeg,
@@ -352,7 +352,7 @@ namespace Y_CalibrationBoard
 
                 DrawTrackedPeople();
             }
-            catch (Exception x)
+            catch (Exception)
             {
                 StopAverage();
                 MessageBox.Show("The selected points are considered bad, try again with better points.", "Bad Points", MessageBoxButtons.OK);
