@@ -64,7 +64,7 @@ namespace Y_API.DetectionAPI.MessageObjects
 
         public override string ToString()
         {
-            return String.Format("Person at ({0}%,{1}%,{2}mm) age={3}", (int)(X * 100), (int)(Y * 100), Z, Age);
+            return String.Format("Person at ({0}%,{1}%,{2}%) age={3}", (int)(X * 100), (int)(Y * 100), (int)(Z * 100), Age);
         }
 
         public string Encode()
