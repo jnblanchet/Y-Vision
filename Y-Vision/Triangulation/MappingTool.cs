@@ -178,7 +178,7 @@ namespace Y_Vision.Triangulation
 
             return new Point3D(
                 distanceToOrigin / _detectedSensorDistance * _displayWidthOccupationRatio + _projectionPaddingWidthRatio,
-                (point.Y / _displayHeight),
+                ((-point.Y + _displayDistanceFromGround) / _displayHeight),
                 distance / _detectedSensorDistance);
         }
     }
