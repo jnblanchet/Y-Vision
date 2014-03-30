@@ -225,6 +225,10 @@ namespace Y_Vision.BlobDescriptor
             public double Magnitude;
             public double SmoothedMag;
             public double Orientation;
+
+            public double ApproxMagnitude;
+            public double ApproxSmoothedMag;
+            public double ApproxOrientation;
             //public double Count;
 
             public void SetCell(double mag, double orien)
