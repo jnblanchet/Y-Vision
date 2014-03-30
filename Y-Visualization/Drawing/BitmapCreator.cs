@@ -67,10 +67,19 @@ namespace Y_Visualization.Drawing
         {
             const ushort maxDepth = 4095;
             const ushort fiveBitsMask = 31;
+            int min;
+            try
+            {
+                min = depth.Where(s => s > 450).Min();
+            }catch
+            {
+                min = 0;
+            }
+            int max = depth.Max() - min;
 
             for (int i = 0; i < depth.Length; i++)
             {
-                var gray = (byte) (depth[i] * fiveBitsMask / maxDepth);
+                var gray = (byte)((double)(depth[i] - min) / max * fiveBitsMask);
                 _depthBufferForDrawing[i] = (short)(gray << 10 | gray << 5 | gray);
             }
         }

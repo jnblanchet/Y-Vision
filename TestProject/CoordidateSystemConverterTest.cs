@@ -16,12 +16,14 @@ namespace YUnitTests
         [TestMethod]
         public void TestNoRotation()
         {
+            // X, Y, DepthValue, max_X, max_Y
             var xyzPoint = _csc.ToXyz(160, 120, 1, 240, 320);
 
             Assert.AreEqual(0, xyzPoint.X);
             Assert.AreEqual(0, xyzPoint.Y);
             Assert.AreEqual(1, xyzPoint.Z);
         }
+        // [...]
 
         [TestMethod]
         public void TestRotationXPositive()

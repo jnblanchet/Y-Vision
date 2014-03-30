@@ -36,14 +36,9 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CollectionTool.cs">
@@ -77,14 +72,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Y-API\Y-API.csproj">
-      <Project>{65E528C8-8E43-4F90-A83F-9F2A9C957518}</Project>
-      <Name>Y-API</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Y-TcpServer\Y-TcpServer.csproj">
-      <Project>{FFB61E5C-CBEE-4921-91F8-67DE987FC832}</Project>
-      <Name>Y-TcpServer</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Y-Vision\Y-Vision.csproj">
       <Project>{A306E913-41C8-4BBD-BE7B-C9BFBBB193EE}</Project>
       <Name>Y-Vision</Name>

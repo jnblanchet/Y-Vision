@@ -94,7 +94,7 @@ namespace Y_Vision.GroundRemoval
             {
                 for (int i = 0; i < _w; i++)
                 {
-                    //// new version (work in progress) uses exacte x,y,z coordinates
+                    //// new version uses exacte x,y,z coordinates
                     var p = _distanceConverter.ToXyz(i, j, 1,_h, _w); // the distance is unknown, we'll solve it.
                     var t = (n.X*_p0.X+n.Y*_p0.Y+n.Z*_p0.Z)/(n.X*p.X+n.Y*p.Y+n.Z*p.Z);
                     _groundMask[j,i] = (short)Math.Max(Math.Min(p.Z * t, short.MaxValue), 0);

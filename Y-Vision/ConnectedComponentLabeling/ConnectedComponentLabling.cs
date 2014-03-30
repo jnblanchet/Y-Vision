@@ -71,7 +71,7 @@ namespace Y_Vision.ConnectedComponentLabeling
 
         //private Blob[] _detectedObjects;
 
-        public short[,] FindConnectedComponents (short[,] image)//todo replace [,] with [][] for performance
+        public short[,] FindConnectedComponents (short[,] image)
         {
             int h = image.GetLength(0), w = image.GetLength(1);
 
@@ -113,14 +113,14 @@ namespace Y_Vision.ConnectedComponentLabeling
                                 label[j, i] = neighborLeft;
                                 if (neighborTop != UnknownLabel)
                                 {
-                                    linked.Union(neighborLeft, neighborTop);  // This may crash when the frame is extremely noisy, TODO: FIX max Index
+                                    linked.Union(neighborLeft, neighborTop);
                                 }
                             } else if (neighborTop != UnknownLabel)
                             {
                                 label[j, i] = neighborTop;
                                 if (neighborLeft != UnknownLabel)
                                 {
-                                    linked.Union(neighborLeft, neighborTop); // This may crash when the frame is extremely noisy, TODO: FIX max Index
+                                    linked.Union(neighborLeft, neighborTop);
                                 }
                             }
                         }
