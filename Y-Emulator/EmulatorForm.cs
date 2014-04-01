@@ -39,18 +39,18 @@ namespace Y_Emulator
 
         /***** static objects (so) in the virtual scene *****/
         private const int so_screenOriginX = 50;
-        private const int so_screenOriginY = 250;
+        private const int so_screenOriginY = 350;
         private const int so_screenWidth = 100;
         private const int so_screenDepth = 10; // purely aesthetics
         private const string so_screenLabel = "SCREEN";
         private const int so_Xaxis_X1 = 10;
-        private const int so_Xaxis_Y1 = 10;
+        private const int so_Xaxis_Y1 = 70;
         private const int so_Xaxis_X2 = 10;
-        private const int so_Xaxis_Y2 = 60;
+        private const int so_Xaxis_Y2 = 20;
         private const int so_Zaxis_X1 = 10;
-        private const int so_Zaxis_Y1 = 10;
+        private const int so_Zaxis_Y1 = 70;
         private const int so_Zaxis_X2 = 60;
-        private const int so_Zaxis_Y2 = 10;
+        private const int so_Zaxis_Y2 = 70;
         /****************************************************/
         private const int circleRadius = 10;
         private const int maxCircles = 10;
@@ -109,7 +109,7 @@ namespace Y_Emulator
             screenLabel.Text = so_screenLabel;
             Point newLocation = new Point();
             newLocation.X = so_screenOriginX - screenLabel.Width;
-            newLocation.Y = so_screenOriginY + so_screenWidth / 2 - screenLabel.Height / 2;
+            newLocation.Y = so_screenOriginY - so_screenWidth / 2 - screenLabel.Height / 2;
             screenLabel.Location = newLocation;
 
             // Axis labels
@@ -122,7 +122,7 @@ namespace Y_Emulator
             xAxisLabel.Text = "X";
             zAxisLabel.Text = "Z";
             newLocation.X = so_Xaxis_X2 - xAxisLabel.Width / 2;
-            newLocation.Y = so_Xaxis_Y2 + 1;
+            newLocation.Y = so_Xaxis_Y2 - xAxisLabel.Height;
             xAxisLabel.Location = newLocation;
             newLocation.X = so_Zaxis_X2 + 1;
             newLocation.Y = so_Zaxis_Y2 - zAxisLabel.Height / 2;
@@ -141,7 +141,7 @@ namespace Y_Emulator
             newLocation.Y = so_screenOriginY - coord0Label.Height / 2;
             coord0Label.Location = newLocation;
             newLocation.X = so_screenOriginX - coord1Label.Width;
-            newLocation.Y = so_screenOriginY + so_screenWidth - coord1Label.Height / 2;
+            newLocation.Y = so_screenOriginY - so_screenWidth - coord1Label.Height / 2;
             coord1Label.Location = newLocation;
 
             /*************************************************************/
@@ -214,10 +214,10 @@ namespace Y_Emulator
             }
 
             // draw the static objects on top of everything
-            e.Graphics.FillRectangle(Brushes.Black, so_screenOriginX, so_screenOriginY, so_screenDepth, so_screenWidth);
+            e.Graphics.FillRectangle(Brushes.Black, so_screenOriginX, so_screenOriginY - so_screenWidth, so_screenDepth, so_screenWidth);
             e.Graphics.DrawLine(Pens.Black, so_Xaxis_X1, so_Xaxis_Y1, so_Xaxis_X2, so_Xaxis_Y2);
-            e.Graphics.DrawLine(Pens.Black, so_Xaxis_X2 - 5, so_Xaxis_Y2 - 5, so_Xaxis_X2, so_Xaxis_Y2); // arrow
-            e.Graphics.DrawLine(Pens.Black, so_Xaxis_X2 + 5, so_Xaxis_Y2 - 5, so_Xaxis_X2, so_Xaxis_Y2); // arrow
+            e.Graphics.DrawLine(Pens.Black, so_Xaxis_X2 - 5, so_Xaxis_Y2 + 5, so_Xaxis_X2, so_Xaxis_Y2); // arrow
+            e.Graphics.DrawLine(Pens.Black, so_Xaxis_X2 + 5, so_Xaxis_Y2 + 5, so_Xaxis_X2, so_Xaxis_Y2); // arrow
             e.Graphics.DrawLine(Pens.Black, so_Zaxis_X1, so_Zaxis_Y1, so_Zaxis_X2, so_Zaxis_Y2);
             e.Graphics.DrawLine(Pens.Black, so_Zaxis_X2 - 5, so_Zaxis_Y2 - 5, so_Zaxis_X2, so_Zaxis_Y2); // arrow
             e.Graphics.DrawLine(Pens.Black, so_Zaxis_X2 - 5, so_Zaxis_Y2 + 5, so_Zaxis_X2, so_Zaxis_Y2); // arrow
@@ -241,9 +241,9 @@ namespace Y_Emulator
                 if (c.center != c.oldCenter)
                 {
                     // the circle moved since last update
-                    // calculate velocity in px / frame (maybe it should be in px/ms...)
-                    c.VelocityX = (float)(c.center.X - c.oldCenter.X);
-                    c.VelocityY = (float)(c.center.Y - c.oldCenter.Y);
+                    // calculate velocity in px/ms
+                    c.VelocityX = (float)(c.center.X - c.oldCenter.X) / ((float)(updateMs) / 1000);
+                    c.VelocityY = (float)(c.center.Y - c.oldCenter.Y) / ((float)(updateMs) / 1000);
                     c.oldCenter = c.center;
                 }
                 else
@@ -347,8 +347,8 @@ namespace Y_Emulator
             List<Person> persons = new List<Person>();
             foreach (Circle c in circles)
             {
-                persons.Add(new EmulatedPerson(c.VelocityY / (float)so_screenWidth, 0.0f, c.VelocityX / (float)so_screenWidth, c.age, 0, 
-                    c.uniqueId, (float)(c.center.Y - so_screenOriginY) / (float)so_screenWidth, 0.0f, (float)(c.center.X - so_screenOriginX) / (float)so_screenWidth));
+                persons.Add(new EmulatedPerson(-c.VelocityY / (float)so_screenWidth, 0.0f, c.VelocityX / (float)so_screenWidth, c.age, 0, 
+                    c.uniqueId, (float)(-1 * (c.center.Y - so_screenOriginY)) / (float)so_screenWidth, 0.0f, (float)(c.center.X - so_screenOriginX) / (float)so_screenWidth));
             }
 
             var data = (persons.Count > 0) ?
