@@ -79,7 +79,11 @@ namespace Y_Visualization.Drawing
 
             for (int i = 0; i < depth.Length; i++)
             {
-                var gray = (byte)((double)(depth[i] - min) / max * fiveBitsMask);
+                byte gray;
+                if (depth[i] > 450)
+                    gray = (byte)((double)(depth[i] - min) / max * fiveBitsMask);
+                else
+                    gray = 0;
                 _depthBufferForDrawing[i] = (short)(gray << 10 | gray << 5 | gray);
             }
         }
