@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace Y_API.DetectionAPI.MessageObjects
 {
@@ -38,6 +39,7 @@ namespace Y_API.DetectionAPI.MessageObjects
         public virtual float Z { get; private set; }
 
         private const char Split = '/';
+        private NumberFormatInfo provider;
 
         // A constructor used for decoding
         public Person(string code)
@@ -70,7 +72,13 @@ namespace Y_API.DetectionAPI.MessageObjects
         public string Encode()
         {
             // Using '/' since ',' is culture specific (float.toString() = x,xx in some cases)
-            return VelocityX + "/" + VelocityY + "/" + VelocityZ + "/" + Age + "/" + LastSeen + "/" + UniqueId + "/" + X + "/" + Y + "/" + Z;
+            // We need this for french settings
+            provider = new NumberFormatInfo();
+            provider.NumberDecimalSeparator = ".";
+
+            return VelocityX.ToString(provider) + "/" + VelocityY.ToString(provider) + "/" + VelocityZ.ToString(provider) +
+                "/" + Age + "/" + LastSeen + "/" + UniqueId + "/" + X.ToString(provider) + "/" + Y.ToString(provider) +
+                "/" + Z.ToString(provider);
         }
 
         // Updates the current object using another already existing object
